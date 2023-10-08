@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "export_receipt")
+@Table(name = "tbl_export_receipt")
 public class ExportReceiptEntity extends BaseEntity{
     @Column(name = "export_date")
     private Date exportDate;

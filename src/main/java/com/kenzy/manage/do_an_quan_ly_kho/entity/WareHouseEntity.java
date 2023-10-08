@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ware_house")
-public class WareHouse extends BaseEntity{
+@Table(name = "tbl_ware_house")
+public class WareHouseEntity extends BaseEntity{
     @Column(name = "ware_house_name")
     private String wareHouseName;
     @Column(name = "location")

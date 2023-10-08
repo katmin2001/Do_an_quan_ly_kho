@@ -22,19 +22,15 @@ import java.util.List;
 public class UserEntity extends BaseEntity implements UserDetails {
     @Column(name = "username", length = 45, nullable = false)
     private String username;
-
     @Column(name = "password", length = 100, nullable = false)
     private String password;
-
-    @Column(name = "email", length = 45, nullable = false)
+    @Column(name = "email", length = 45)
     private String email;
-
-    @Column(name = "name", length = 45, nullable = false)
+    @Column(name = "name", length = 45)
     private String name;
-
-    @Column(name = "phone", length = 45, nullable = false)
+    @Column(name = "phone", length = 45)
     private String phone;
-    @Column(name = "address", length = 100, nullable = false)
+    @Column(name = "address", length = 100)
     private String address;
     @Column(name = "role")
     @Enumerated(EnumType.STRING)

@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "export_receipt_detail")
+@Table(name = "tbl_export_receipt_detail")
 public class ExportReceiptDetailEntity extends BaseEntity{
     @Column(name = "export_receipt_id")
     private Long importReceiptId;
