@@ -1,8 +1,8 @@
 package com.kenzy.manage.do_an_quan_ly_kho.auth;
 
 import com.kenzy.manage.do_an_quan_ly_kho.config.JwtService;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.UserEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Role;
+import com.kenzy.manage.do_an_quan_ly_kho.model.entity.UserEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.model.entity.constant.Role;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

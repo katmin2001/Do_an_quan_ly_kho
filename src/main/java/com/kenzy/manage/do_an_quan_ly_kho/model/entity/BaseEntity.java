@@ -1,4 +1,4 @@
-package com.kenzy.manage.do_an_quan_ly_kho.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,9 +17,9 @@ public abstract class BaseEntity {
     @Column(name = "status", nullable = true)
     private Boolean status = Boolean.TRUE;
     @Column(name = "created_date", nullable = true)
-    private Date createdDate;
+    private Date createdDate = new Date();
     @Column(name = "updated_date", nullable = true)
-    private Date updatedDate;
+    private Date updatedDate = new Date();
     @Column(name = "created_by", nullable = true)
     private String createdBy;
     @Column(name = "updated_by", nullable = true)

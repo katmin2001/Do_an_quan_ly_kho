@@ -1,4 +1,4 @@
-package com.kenzy.manage.do_an_quan_ly_kho.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,14 +15,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tbl_order_detail")
-public class OrderDetailEntity extends BaseEntity{
-    @Column(name = "order_id")
-    private Long orderId;
+@Table(name = "tbl_export_receipt_detail")
+public class ExportReceiptDetailEntity extends BaseEntity{
+    @Column(name = "export_receipt_id")
+    private Long importReceiptId;
     @Column(name = "product_id")
     private Long productId;
     @Column(name = "quantity")
-    private Integer quantity;
+    private Long quantity;
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 }

@@ -1,4 +1,4 @@
-package com.kenzy.manage.do_an_quan_ly_kho.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,5 +20,5 @@ public class CategoryEntity extends BaseEntity{
     @Column(name = "description")
     private String description;
     @Column(name = "category_image")
-    private String category_image;
+    private String categoryImage;
 }

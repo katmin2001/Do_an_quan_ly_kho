@@ -1,6 +1,6 @@
-package com.kenzy.manage.do_an_quan_ly_kho.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
 
-import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Role;
+import com.kenzy.manage.do_an_quan_ly_kho.model.entity.constant.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

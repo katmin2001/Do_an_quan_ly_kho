@@ -1,4 +1,4 @@
-package com.kenzy.manage.do_an_quan_ly_kho.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,8 +15,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tbl_export_receipt")
-public class ExportReceiptEntity extends BaseEntity{
-    @Column(name = "export_date")
-    private Date exportDate;
+@Table(name = "tbl_import_receipt")
+public class ImportReceiptEntity extends BaseEntity{
+    @Column(name = "import_date")
+    private Date importDate;
 }

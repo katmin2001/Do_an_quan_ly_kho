@@ -1,4 +1,4 @@
-package com.kenzy.manage.do_an_quan_ly_kho.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,21 +9,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tbl_payment")
-public class PaymentEntity extends BaseEntity{
+@Table(name = "tbl_order_detail")
+public class OrderDetailEntity extends BaseEntity{
     @Column(name = "order_id")
     private Long orderId;
-    @Column(name = "payment_amount")
-    private BigDecimal paymentAmount;
-    @Column(name = "payment_method")
-    private String paymentMethod;
-    @Column(name = "payment_date")
-    private Date paymentDate;
+    @Column(name = "product_id")
+    private Long productId;
+    @Column(name = "quantity")
+    private Integer quantity;
+    @Column(name = "total_price")
+    private BigDecimal totalPrice;
 }
