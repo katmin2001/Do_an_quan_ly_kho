@@ -1,4 +1,4 @@
-package com.kenzy.manage.do_an_quan_ly_kho.model.entity;
+package com.kenzy.manage.do_an_quan_ly_kho.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tbl_supplier")
-public class SupplierEntity extends BaseEntity{
-    @Column(name = "contact_name")
-    private String contactName;
+@Table(name = "tbl_customer")
+public class CustomerEntity extends BaseEntity{
+    @Column(name = "name")
+    private String name;
     @Column(name = "email")
     private String email;
     @Column(name = "phone")

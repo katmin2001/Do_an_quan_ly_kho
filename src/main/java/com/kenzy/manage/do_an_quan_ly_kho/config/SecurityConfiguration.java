@@ -1,6 +1,6 @@
 package com.kenzy.manage.do_an_quan_ly_kho.config;
 
-import com.kenzy.manage.do_an_quan_ly_kho.model.entity.constant.Role;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("api/admin/**").hasAnyRole(Role.ADMIN.name())
-                        .requestMatchers("/home/**","/login","/register","/upload/**","/api/**").permitAll()
+//                        .requestMatchers("api/**").hasAnyRole(Role.MANAGER.name())
+                        .requestMatchers("/login","/register","/upload/**","/api/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

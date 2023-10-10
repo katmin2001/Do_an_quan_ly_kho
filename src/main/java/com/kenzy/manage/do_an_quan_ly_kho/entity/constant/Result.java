@@ -1,6 +1,5 @@
-package com.kenzy.manage.do_an_quan_ly_kho.model.entity.constant;
+package com.kenzy.manage.do_an_quan_ly_kho.entity.constant;
 
-import com.kenzy.manage.do_an_quan_ly_kho.model.entity.CategoryEntity;
 import lombok.Data;
 
 @Data
