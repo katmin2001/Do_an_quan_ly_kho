@@ -3,14 +3,13 @@ package com.kenzy.manage.do_an_quan_ly_kho.service;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.CategoryEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.CategoryRequest;
-import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchCategoryRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -49,7 +47,7 @@ public class CategoryService extends BaseService {
         }
     }
 
-    public ResponseEntity<Result> searchCategory(SearchCategoryRequest request) {
+    public ResponseEntity<Result> searchCategory(SearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
         Page<CategoryEntity> page = categoryRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), pageable);
@@ -67,7 +65,7 @@ public class CategoryService extends BaseService {
         }
     }
 
-    public CategoryEntity saveCategory(CategoryRequest categoryRequest, MultipartFile file) throws IOException {
+    private CategoryEntity saveCategory(CategoryRequest categoryRequest, MultipartFile file) throws IOException {
         CategoryEntity category = null;
         if (categoryRequest.getId() == null) {
             category = new CategoryEntity();

@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class SearchCategoryRequest {
+public class SearchRequest {
     private String keyword;
     @JsonFormat(pattern = "yyyy/MM/dd")
     private Date fromDate;

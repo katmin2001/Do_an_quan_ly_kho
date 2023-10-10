@@ -2,7 +2,7 @@ package com.kenzy.manage.do_an_quan_ly_kho.controller;
 
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.CategoryRequest;
-import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchCategoryRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,7 @@ public class CategoryController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Result> searchCategory(@RequestBody SearchCategoryRequest request) {
+    public ResponseEntity<Result> searchCategory(@RequestBody SearchRequest request) {
         return categoryService.searchCategory(request);
     }
 
