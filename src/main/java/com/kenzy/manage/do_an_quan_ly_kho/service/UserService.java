@@ -6,6 +6,7 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Role;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserEditRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.IGetUserResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.UserResponse;
@@ -77,9 +78,9 @@ public class UserService extends BaseService {
     public ResponseEntity<Result> searchUser(SearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
-        Page<UserEntity> page = userRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), pageable);
+        Page<IGetUserResponse> page = userRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), pageable);
         metaList.setTotal(page.getTotalElements());
-        SearchResponse<UserEntity> response = new SearchResponse<>(page.toList(), metaList);
+        SearchResponse<IGetUserResponse> response = new SearchResponse<>(page.toList(), metaList);
         return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
     }
 

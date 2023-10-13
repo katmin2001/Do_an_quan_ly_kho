@@ -1,6 +1,7 @@
 package com.kenzy.manage.do_an_quan_ly_kho.repository;
 
 import com.kenzy.manage.do_an_quan_ly_kho.entity.UserEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.IGetUserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,10 +17,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     boolean existsUserByUsername(String username);
 
-    @Query(value = "SELECT * FROM quan_ly_kho.tbl_user tu " +
+    @Query(value = "SELECT tu.id, tu.username, tu.name, tu.email, tu.address, tu.phone FROM quan_ly_kho.tbl_user tu " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tu.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tu.created_date <= :toDate) " +
             "AND (LOWER(tu.name) like CONCAT('%', LOWER(:keyword), '%') or tu.username like CONCAT('%', LOWER(:keyword), '%')) AND tu.status = true AND tu.role != 'ADMIN' ",
             nativeQuery = true)
-    Page<UserEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
+    Page<IGetUserResponse> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 }
