@@ -11,6 +11,8 @@ import java.util.Date;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+    boolean existsCategoryEntityById(Long id);
+
     @Query(value = "SELECT * FROM quan_ly_kho.tbl_category tc " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tc.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tc.created_date <= :toDate) " +

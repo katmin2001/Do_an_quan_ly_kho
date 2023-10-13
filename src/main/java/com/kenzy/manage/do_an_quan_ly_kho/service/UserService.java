@@ -9,7 +9,6 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.IGetUserResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.UserResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

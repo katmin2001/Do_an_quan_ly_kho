@@ -5,7 +5,6 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserEditRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserRequest;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +38,14 @@ public class UserController {
     public ResponseEntity<Result> active(@PathVariable("id") Long id) {
         return userService.active(id);
     }
+
     @GetMapping("/detail/{id}")
     public ResponseEntity<Result> detail(@PathVariable("id") Long id) {
         return userService.detail(id);
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Result> search(@RequestBody SearchRequest request){
+    public ResponseEntity<Result> search(@RequestBody SearchRequest request) {
         return userService.searchUser(request);
     }
 }

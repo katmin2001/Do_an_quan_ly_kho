@@ -10,13 +10,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class FileService {
-    public static String uploadFile(MultipartFile file, String uploadDir, String nameExtend) throws IOException {
+    public static String uploadFile(MultipartFile file, String uploadDir) throws IOException {
         if (!Files.exists(Paths.get(uploadDir))) {
             Files.createDirectories(Paths.get(uploadDir));
         }
         String fileName = file.getOriginalFilename();
         String[] name = fileName.split("\\.");
-        fileName = nameExtend + "_" + convertDate() + "." + name[1];
+        fileName = name[0] + "_" + convertDate() + "." + name[1];
         Path filePath = Paths.get(uploadDir, fileName);
         Files.copy(file.getInputStream(), filePath);
         return filePath.toString();

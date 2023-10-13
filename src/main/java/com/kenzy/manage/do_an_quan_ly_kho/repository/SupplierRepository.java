@@ -17,4 +17,6 @@ public interface SupplierRepository extends JpaRepository<SupplierEntity, Long> 
             "AND (LOWER(ts.contact_name) like CONCAT('%', LOWER(:keyword), '%')) AND ts.status = true ",
             nativeQuery = true)
     Page<SupplierEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
+
+    boolean existsSupplierEntityById(Long id);
 }

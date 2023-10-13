@@ -79,7 +79,7 @@ public class CategoryService extends BaseService {
         }
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
-        category.setCategoryImage(FileService.uploadFile(file, UPLOAD_DIR, category.getName()));
+        category.setCategoryImage(FileService.uploadFile(file, UPLOAD_DIR));
         return categoryRepository.save(category);
     }
 }
