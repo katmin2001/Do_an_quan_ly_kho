@@ -18,11 +18,15 @@ import java.math.BigDecimal;
 @Table(name = "tbl_export_receipt_detail")
 public class ExportReceiptDetailEntity extends BaseEntity{
     @Column(name = "export_receipt_id")
-    private Long importReceiptId;
+    private Long exportReceiptId;
     @Column(name = "product_id")
     private Long productId;
     @Column(name = "quantity")
     private Long quantity;
     @Column(name = "total_price")
     private BigDecimal totalPrice;
+    @Column(name = "order_id")
+    private Long orderId;
+    @Column(name = "import_receipt_id")
+    private Long importReceiptId;
 }

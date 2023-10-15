@@ -16,7 +16,11 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "tbl_import_receipt")
-public class ImportReceiptEntity extends BaseEntity{
+public class ImportReceiptEntity extends BaseEntity {
     @Column(name = "import_date")
     private Date importDate;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "ware_house_id")
+    private Long wareHouseId;
 }

@@ -19,4 +19,8 @@ import java.util.Date;
 public class ExportReceiptEntity extends BaseEntity{
     @Column(name = "export_date")
     private Date exportDate;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "ware_house_id")
+    private Long wareHouseId;
 }
