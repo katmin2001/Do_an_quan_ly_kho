@@ -4,6 +4,7 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.ImportReceiptDetailEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ImportReceiptEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.ImportReceiptDetailRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ImportReceiptRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ImportReceiptDetailRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ImportReceiptRepository;
@@ -14,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ImportReceiptService extends BaseService {
@@ -33,33 +36,38 @@ public class ImportReceiptService extends BaseService {
         }
     }
 
-    private ImportReceiptDetailEntity createAndEditImportReceipt(ImportReceiptRequest request) {
+    private List<ImportReceiptDetailEntity> createAndEditImportReceipt(ImportReceiptRequest request) {
         ImportReceiptEntity importReceipt = null;
-        ImportReceiptDetailEntity importReceiptDetail = null;
+        List<ImportReceiptDetailEntity> importReceiptDetailList = new ArrayList<>();
         if (request.getId() == null) {
             importReceipt = new ImportReceiptEntity();
-            importReceiptDetail = new ImportReceiptDetailEntity();
         } else {
             importReceipt = importReceiptRepository.findById(request.getId()).orElseThrow(null);
             if (importReceipt == null) {
                 throw new NullPointerException("Not found import receipt");
             }
-            importReceiptDetail = importReceiptDetailRepository.findByImportReceiptId(request.getId());
+            importReceiptDetailList = importReceiptDetailRepository.getImportReceiptDetailEntitiesByImportReceiptId(request.getId());
+            importReceiptDetailRepository.deleteAll(importReceiptDetailList);
+            importReceiptDetailList.clear();
             importReceipt.setUpdatedDate(new Date());
-            importReceiptDetail.setUpdatedDate(new Date());
         }
         importReceipt.setImportDate(new Date());
         importReceipt.setName(request.getName());
-        importReceiptDetail.setQuantity(request.getQuantity());
-        importReceiptDetail.setProductId(request.getProductId());
-        ProductEntity product = productRepository.findById(request.getProductId()).orElseThrow(null);
-        if (product == null) {
-            throw new NullPointerException("Not found product");
-        }
-        BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()));
-        importReceiptDetail.setTotalPrice(totalPrice);
         importReceiptRepository.save(importReceipt);
-        importReceiptDetail.setImportReceiptId(importReceipt.getId());
-        return importReceiptDetailRepository.save(importReceiptDetail);
+        for(ImportReceiptDetailRequest receiptDetailRequest: request.getImportReceiptDetailRequest()){
+            ImportReceiptDetailEntity importReceiptDetail = new ImportReceiptDetailEntity();
+            importReceiptDetail.setQuantity(receiptDetailRequest.getQuantity());
+            importReceiptDetail.setProductId(receiptDetailRequest.getProductId());
+            ProductEntity product = productRepository.findById(receiptDetailRequest.getProductId()).orElseThrow(null);
+            if (product == null) {
+                throw new NullPointerException("Not found product");
+            }
+            BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(receiptDetailRequest.getQuantity()));
+            importReceiptDetail.setTotalPrice(totalPrice);
+            importReceiptDetail.setImportReceiptId(importReceipt.getId());
+            importReceiptDetail.setUpdatedDate(new Date());
+            importReceiptDetailList.add(importReceiptDetail);
+        }
+        return importReceiptDetailRepository.saveAll(importReceiptDetailList);
     }
 }
