@@ -12,4 +12,9 @@ import java.util.List;
 public interface ImportReceiptDetailRepository extends JpaRepository<ImportReceiptDetailEntity, Long> {
     ImportReceiptDetailEntity findByImportReceiptId(Long id);
     List<ImportReceiptDetailEntity> getImportReceiptDetailEntitiesByImportReceiptId(Long id);
+
+    @Query(value = "SELECT sum(tird.quantity)\n" +
+            "FROM quan_ly_kho.tbl_import_receipt_detail tird\n" +
+            "where product_id = :id ", nativeQuery = true)
+    long getQuantityProductInWareHouseById(Long id);
 }
