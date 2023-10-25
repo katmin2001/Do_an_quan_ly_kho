@@ -25,4 +25,6 @@ public class ImportReceiptDetailEntity extends BaseEntity{
     private Long quantity;
     @Column(name = "total_price")
     private BigDecimal totalPrice;
+    @Column(name = "unit_price")
+    private BigDecimal unitPrice;
 }

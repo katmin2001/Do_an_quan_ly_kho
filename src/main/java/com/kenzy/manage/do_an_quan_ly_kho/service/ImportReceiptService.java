@@ -153,11 +153,12 @@ public class ImportReceiptService extends BaseService {
             ImportReceiptDetailEntity importReceiptDetail = new ImportReceiptDetailEntity();
             importReceiptDetail.setQuantity(receiptDetailRequest.getQuantity());
             importReceiptDetail.setProductId(receiptDetailRequest.getProductId());
-            ProductEntity product = productRepository.findById(receiptDetailRequest.getProductId()).orElseThrow(null);
-            if (product == null) {
-                throw new NullPointerException("Not found product");
-            }
-            BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(receiptDetailRequest.getQuantity()));
+//            ProductEntity product = productRepository.findById(receiptDetailRequest.getProductId()).orElseThrow(null);
+//            if (product == null) {
+//                throw new NullPointerException("Not found product");
+//            }
+            importReceiptDetail.setUnitPrice(receiptDetailRequest.getPriceUnit());
+            BigDecimal totalPrice = receiptDetailRequest.getPriceUnit().multiply(BigDecimal.valueOf(receiptDetailRequest.getQuantity()));
             importReceiptDetail.setTotalPrice(totalPrice);
             importReceiptDetail.setImportReceiptId(importReceipt.getId());
             importReceiptDetail.setUpdatedDate(new Date());
