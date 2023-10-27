@@ -3,6 +3,7 @@ package com.kenzy.manage.do_an_quan_ly_kho.service;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderDetailEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.OrderStatus;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.OrderProductRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.OrderRequest;
@@ -43,7 +44,7 @@ public class OrderService extends BaseService {
             return ResponseEntity.ok(new Result("SUCCESS", "OK", createAndUpdateOrder(request)));
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "CONFLICT", null));
         }
     }
@@ -64,7 +65,7 @@ public class OrderService extends BaseService {
             order.setUpdatedDate(new Date());
         }
         order.setOrderDate(new Date());
-        order.setOrderStatus("Đang xử lý");
+        order.setOrderStatus(OrderStatus.IN_PROGRESS.getName());
         order.setCustomerId(request.getCustomerId());
         orderRepository.save(order);
         for (OrderProductRequest productRequest : request.getOrderProductRequestList()) {
@@ -77,7 +78,7 @@ public class OrderService extends BaseService {
             }
             long quantityInWareHouse = importReceiptDetailRepository.getQuantityProductInWareHouseById(productRequest.getProductId());
             long quantityExport = exportReceiptDetailRepository.getQuantityProductExportById(productRequest.getProductId());
-            if((quantityInWareHouse - quantityExport) < productRequest.getQuantity()){
+            if ((quantityInWareHouse - quantityExport) < productRequest.getQuantity()) {
                 orderRepository.deleteById(order.getId());
                 throw new RuntimeException("Not enough product: " + product.getProductName());
             }
@@ -86,7 +87,21 @@ public class OrderService extends BaseService {
             orderDetail.setTotalPrice(totalPrice);
             orderDetailEntityList.add(orderDetail);
         }
-        exportReceiptService.saveExportReceipt(request, order.getId());
+//        exportReceiptService.saveExportReceipt(request, order.getId());
         return orderDetailRepository.saveAll(orderDetailEntityList);
+    }
+
+    public ResponseEntity<Result> cancelOrder(Long id) {
+        try {
+            OrderEntity order = orderRepository.findById(id).orElse(null);
+            if (order == null) {
+                throw new NullPointerException("Not found order");
+            }
+            order.setOrderStatus(OrderStatus.CANCEL.getName());
+            order.setUpdatedDate(new Date());
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", orderRepository.save(order)));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
+        }
     }
 }
