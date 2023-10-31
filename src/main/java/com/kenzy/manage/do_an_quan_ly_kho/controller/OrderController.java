@@ -38,4 +38,9 @@ public class OrderController {
     public ResponseEntity<Result> search(@RequestBody SearchRequest request) {
         return orderService.searchOrder(request);
     }
+
+    @GetMapping("/detail-order/{id}")
+    public ResponseEntity<Result> detailOrder(@PathVariable("id") Long id) {
+        return orderService.getDetailOrderByOrderId(id);
+    }
 }

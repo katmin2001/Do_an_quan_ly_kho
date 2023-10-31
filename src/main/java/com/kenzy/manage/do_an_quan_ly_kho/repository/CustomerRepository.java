@@ -14,7 +14,7 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query(value = "SELECT * FROM quan_ly_kho.tbl_customer tc " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tc.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tc.created_date <= :toDate) " +
-            "AND (LOWER(tc.name) like CONCAT('%', LOWER(:keyword), '%')) AND tc.status = true ",
+            "AND (LOWER(tc.name) like CONCAT('%', LOWER(:keyword), '%')) ",
             nativeQuery = true)
     Page<CustomerEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 }

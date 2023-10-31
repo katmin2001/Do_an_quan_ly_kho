@@ -148,6 +148,23 @@ public class OrderService extends BaseService {
         return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
     }
 
+    public ResponseEntity<Result> getDetailOrderByOrderId(Long id) {
+        try {
+            OrderEntity order = orderRepository.findById(id).orElse(null);
+            if (order == null) {
+                throw new NullPointerException("Not found order");
+            }
+            List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(id);
+            List<OrderDetailResponse> responses = new ArrayList<>();
+            for (OrderDetailEntity orderDetail : orderDetailEntityList) {
+                responses.add(mapperOrderDetail(orderDetail));
+            }
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", responses));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
+        }
+    }
+
     private OrderResponse detail(Long id) {
         OrderEntity order = orderRepository.findById(id).orElse(null);
         if (order == null) {
