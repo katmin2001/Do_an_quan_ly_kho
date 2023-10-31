@@ -14,5 +14,5 @@ public interface ExportReceiptDetailRepository extends JpaRepository<ExportRecei
     @Query(value = "SELECT sum(terd.quantity)\n" +
             "FROM quan_ly_kho.tbl_export_receipt_detail terd\n" +
             "where product_id = :id ", nativeQuery = true)
-    long getQuantityProductExportById(Long id);
+    Integer getQuantityProductExportById(Long id);
 }

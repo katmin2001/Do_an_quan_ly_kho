@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -23,4 +24,6 @@ public class OrderEntity extends BaseEntity{
     private String orderStatus;
     @Column(name = "customer_id")
     private Long customerId;
+    @Column(name = "total_amount")
+    private BigDecimal totalAmount;
 }

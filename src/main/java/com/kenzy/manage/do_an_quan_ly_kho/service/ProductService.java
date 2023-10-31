@@ -106,8 +106,11 @@ public class ProductService extends BaseService {
         return productRepository.save(product);
     }
 
-    private ProductResponse detailProduct(Long id) {
-        ProductEntity product = productRepository.findById(id).orElseThrow(null);
+    public ProductResponse detailProduct(Long id) {
+        ProductEntity product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            throw new NullPointerException("Not found product");
+        }
         ProductResponse response = new ProductResponse();
         response.setId(id);
         response.setProductName(product.getProductName());

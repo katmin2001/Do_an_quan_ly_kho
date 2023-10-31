@@ -7,6 +7,6 @@ import java.math.BigDecimal;
 @Data
 public class ImportReceiptDetailRequest {
     private Long productId;
-    private long quantity;
+    private int quantity;
     private BigDecimal priceUnit;
 }

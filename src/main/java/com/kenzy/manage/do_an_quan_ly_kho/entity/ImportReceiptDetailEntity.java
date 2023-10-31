@@ -22,7 +22,7 @@ public class ImportReceiptDetailEntity extends BaseEntity{
     @Column(name = "product_id")
     private Long productId;
     @Column(name = "quantity")
-    private Long quantity;
+    private int quantity;
     @Column(name = "total_price")
     private BigDecimal totalPrice;
     @Column(name = "unit_price")

@@ -71,7 +71,7 @@ public class ExportReceiptService extends BaseService {
             }
             exportReceiptDetail.setProductId(productRequest.getProductId());
             exportReceiptDetail.setExportReceiptId(exportReceipt.getId());
-            exportReceiptDetail.setQuantity((long) productRequest.getQuantity());
+            exportReceiptDetail.setQuantity(productRequest.getQuantity());
             exportReceiptDetail.setOrderId(orderId);
             exportReceiptDetail.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity())));
             exportReceiptDetailEntityList.add(exportReceiptDetail);

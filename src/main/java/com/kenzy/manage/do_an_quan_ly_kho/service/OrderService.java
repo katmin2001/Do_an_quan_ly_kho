@@ -1,5 +1,6 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
+import com.kenzy.manage.do_an_quan_ly_kho.entity.CustomerEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderDetailEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
@@ -7,8 +8,15 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.OrderStatus;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.OrderProductRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.OrderRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.OrderDetailResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.OrderResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,6 +46,10 @@ public class OrderService extends BaseService {
     private ExportReceiptService exportReceiptService;
     @Autowired
     private ImportReceiptDetailRepository importReceiptDetailRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private ProductService productService;
 
     public ResponseEntity<Result> createAndUpdate(OrderRequest request) {
         try {
@@ -45,7 +57,7 @@ public class OrderService extends BaseService {
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "CONFLICT", null));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Result(e.getMessage(), "CONFLICT", null));
         }
     }
 
@@ -68,6 +80,7 @@ public class OrderService extends BaseService {
         order.setOrderStatus(OrderStatus.IN_PROGRESS.getName());
         order.setCustomerId(request.getCustomerId());
         orderRepository.save(order);
+        BigDecimal totalAmount = BigDecimal.valueOf(0);
         for (OrderProductRequest productRequest : request.getOrderProductRequestList()) {
             OrderDetailEntity orderDetail = new OrderDetailEntity();
             orderDetail.setProductId(productRequest.getProductId());
@@ -76,8 +89,14 @@ public class OrderService extends BaseService {
             if (product == null) {
                 throw new NullPointerException("Not found product");
             }
-            long quantityInWareHouse = importReceiptDetailRepository.getQuantityProductInWareHouseById(productRequest.getProductId());
-            long quantityExport = exportReceiptDetailRepository.getQuantityProductExportById(productRequest.getProductId());
+            Integer quantityInWareHouse = importReceiptDetailRepository.getQuantityProductInWareHouseById(productRequest.getProductId());
+            if (quantityInWareHouse == null) {
+                quantityInWareHouse = 0;
+            }
+            Integer quantityExport = exportReceiptDetailRepository.getQuantityProductExportById(productRequest.getProductId());
+            if (quantityExport == null) {
+                quantityExport = 0;
+            }
             if ((quantityInWareHouse - quantityExport) < productRequest.getQuantity()) {
                 orderRepository.deleteById(order.getId());
                 throw new RuntimeException("Not enough product: " + product.getProductName());
@@ -85,8 +104,11 @@ public class OrderService extends BaseService {
             orderDetail.setOrderId(order.getId());
             BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
             orderDetail.setTotalPrice(totalPrice);
+            totalAmount = totalAmount.add(totalPrice);
             orderDetailEntityList.add(orderDetail);
         }
+        order.setTotalAmount(totalAmount);
+        orderRepository.save(order);
 //        exportReceiptService.saveExportReceipt(request, order.getId());
         return orderDetailRepository.saveAll(orderDetailEntityList);
     }
@@ -103,5 +125,72 @@ public class OrderService extends BaseService {
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
+    }
+
+    public ResponseEntity<Result> detailOrder(Long id) {
+        try {
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", detail(id)));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
+        }
+    }
+
+    public ResponseEntity<Result> searchOrder(SearchRequest request) {
+        MetaList metaList = request.getMeta();
+        Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
+        Page<OrderEntity> page = orderRepository.search(request.getFromDate(), request.getToDate(), pageable);
+        List<OrderResponse> responses = new ArrayList<>();
+        for (OrderEntity order : page) {
+            responses.add(mapperOrder(order));
+        }
+        metaList.setTotal(page.getTotalElements());
+        SearchResponse<OrderResponse> response = new SearchResponse<>(responses, metaList);
+        return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
+    }
+
+    private OrderResponse detail(Long id) {
+        OrderEntity order = orderRepository.findById(id).orElse(null);
+        if (order == null) {
+            throw new NullPointerException("Not found order");
+        }
+        OrderResponse response = new OrderResponse();
+        response.setId(order.getId());
+        response.setOrderDate(order.getOrderDate());
+        response.setOrderStatus(order.getOrderStatus());
+        CustomerEntity customer = customerRepository.findById(order.getCustomerId()).orElse(null);
+        if (customer == null) {
+            throw new NullPointerException("Not found customer");
+        }
+        response.setCustomer(customer);
+        List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(id);
+        List<OrderDetailResponse> orderDetailResponseList = new ArrayList<>();
+        for (OrderDetailEntity orderDetail : orderDetailEntityList) {
+            orderDetailResponseList.add(mapperOrderDetail(orderDetail));
+        }
+        response.setOrderDetailResponseList(orderDetailResponseList);
+        response.setTotalAmount(order.getTotalAmount());
+        return response;
+    }
+
+    private OrderResponse mapperOrder(OrderEntity order) {
+        CustomerEntity customer = customerRepository.findById(order.getCustomerId()).orElse(null);
+        if (customer == null) {
+            throw new NullPointerException("Not found customer");
+        }
+        OrderResponse response = new OrderResponse();
+        response.setId(order.getId());
+        response.setOrderDate(order.getOrderDate());
+        response.setOrderStatus(order.getOrderStatus());
+        response.setCustomer(customer);
+        response.setTotalAmount(order.getTotalAmount());
+        return response;
+    }
+
+    private OrderDetailResponse mapperOrderDetail(OrderDetailEntity orderDetail) {
+        OrderDetailResponse response = new OrderDetailResponse();
+        response.setQuantity(orderDetail.getQuantity());
+        response.setProduct(productService.detailProduct(orderDetail.getProductId()));
+        response.setTotalPrice(orderDetail.getTotalPrice());
+        return response;
     }
 }

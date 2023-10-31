@@ -17,7 +17,7 @@ public interface ImportReceiptDetailRepository extends JpaRepository<ImportRecei
     @Query(value = "SELECT sum(tird.quantity)\n" +
             "FROM quan_ly_kho.tbl_import_receipt_detail tird\n" +
             "where product_id = :id ", nativeQuery = true)
-    long getQuantityProductInWareHouseById(Long id);
+    Integer getQuantityProductInWareHouseById(Long id);
     List<ImportReceiptDetailEntity> getImportReceiptDetailEntitiesByProductId(Long id);
 
 }

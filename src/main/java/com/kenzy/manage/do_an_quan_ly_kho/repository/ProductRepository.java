@@ -17,6 +17,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             "FROM quan_ly_kho.tbl_product tp " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tp.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tp.created_date <= :toDate) " +
-            "AND (LOWER(tp.product_name) like CONCAT('%', LOWER(:keyword), '%')) AND tp.status = true ", nativeQuery = true)
+            "AND (LOWER(tp.product_name) like CONCAT('%', LOWER(:keyword), '%')) ", nativeQuery = true)
     Page<ProductEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 }
