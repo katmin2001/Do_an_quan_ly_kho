@@ -19,8 +19,6 @@ import java.math.BigDecimal;
 public class BillEntity extends BaseEntity{
     @Column(name = "total_price")
     private BigDecimal totalPrice;
-    @Column(name = "order_id")
-    private Long orderId;
     @Column(name = "payment_id")
     private Long paymentId;
 }

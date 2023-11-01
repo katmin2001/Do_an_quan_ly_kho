@@ -85,6 +85,5 @@ public class CustomerService extends BaseService {
         customer.setEmail(request.getEmail());
         customer.setAddress(request.getAddress());
         return customerRepository.save(customer);
-
     }
 }

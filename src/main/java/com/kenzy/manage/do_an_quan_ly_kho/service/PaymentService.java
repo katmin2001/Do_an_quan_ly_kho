@@ -36,7 +36,7 @@ public class PaymentService extends BaseService {
     public ResponseEntity<Result> createAndEdit(PaymentRequest request) {
         try {
             return ResponseEntity.ok(new Result("SUCCESS", "OK", savePayment(request)));
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
     }
@@ -101,7 +101,7 @@ public class PaymentService extends BaseService {
         return paymentRepository.save(payment);
     }
 
-    private PaymentResponse detail(Long id) {
+    public PaymentResponse detail(Long id) {
         PaymentEntity payment = paymentRepository.findById(id).orElse(null);
         if (payment == null) {
             throw new NullPointerException("Not found payment");
@@ -121,6 +121,7 @@ public class PaymentService extends BaseService {
 
     private OrderPaymentResponse mapperOrderPayment(OrderEntity order) {
         OrderPaymentResponse response = new OrderPaymentResponse();
+        response.setId(order.getId());
         response.setOrderDate(order.getOrderDate());
         CustomerEntity customer = customerRepository.findById(order.getCustomerId()).orElse(null);
         if (customer == null) {
