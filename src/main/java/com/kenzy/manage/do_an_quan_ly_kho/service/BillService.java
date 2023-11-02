@@ -4,16 +4,23 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.BillEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.PaymentEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.BillRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.BillResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.PaymentResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.BillRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class BillService extends BaseService {
@@ -53,6 +60,19 @@ public class BillService extends BaseService {
         }
     }
 
+    public ResponseEntity<Result> searchBill(SearchRequest request){
+        MetaList metaList = request.getMeta();
+        Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
+        Page<BillEntity> page = billRepository.search(request.getFromDate(), request.getToDate(), pageable);
+        List<BillResponse> responses = new ArrayList<>();
+        for (BillEntity bill : page) {
+            responses.add(detail(bill.getId()));
+        }
+        metaList.setTotal(page.getTotalElements());
+        SearchResponse<BillResponse> response = new SearchResponse<>(responses, metaList);
+        return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
+    }
+
     private BillResponse detail(Long id) {
         BillEntity bill = billRepository.findById(id).orElse(null);
         if (bill == null) {
@@ -77,11 +97,11 @@ public class BillService extends BaseService {
             }
             bill.setUpdatedDate(new Date());
         }
-        bill.setPaymentId(request.getPaymentId());
-        PaymentEntity payment = paymentRepository.findById(request.getId()).orElse(null);
+        PaymentEntity payment = paymentRepository.findById(request.getPaymentId()).orElse(null);
         if (payment == null) {
             throw new NullPointerException("Not found payment");
         }
+        bill.setPaymentId(request.getPaymentId());
         bill.setTotalPrice(payment.getPaymentAmount());
         return billRepository.save(bill);
     }
