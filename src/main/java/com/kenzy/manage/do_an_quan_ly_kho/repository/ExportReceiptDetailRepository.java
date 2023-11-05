@@ -15,4 +15,6 @@ public interface ExportReceiptDetailRepository extends JpaRepository<ExportRecei
             "FROM quan_ly_kho.tbl_export_receipt_detail terd\n" +
             "where product_id = :id ", nativeQuery = true)
     Integer getQuantityProductExportById(Long id);
+
+    List<ExportReceiptDetailEntity> getExportReceiptDetailEntitiesByProductId(Long id);
 }
