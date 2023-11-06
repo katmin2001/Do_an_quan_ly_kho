@@ -32,6 +32,8 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private String phone;
     @Column(name = "address", length = 100)
     private String address;
+    @Column(name = "avatar")
+    private String avatar;
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;

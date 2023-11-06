@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/api/admin/user")
@@ -20,13 +21,15 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<Result> create(@RequestBody UserRequest request) {
-        return userService.create(request);
+    public ResponseEntity<Result> create(@RequestPart UserRequest request,
+                                         @RequestPart MultipartFile file) {
+        return userService.create(request, file);
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<Result> edit(@RequestBody UserEditRequest request) {
-        return userService.edit(request);
+    public ResponseEntity<Result> edit(@RequestPart UserEditRequest request,
+                                       @RequestPart MultipartFile file) {
+        return userService.edit(request, file);
     }
 
     @PostMapping("/inactive/{id}")

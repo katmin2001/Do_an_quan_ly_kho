@@ -17,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 
 @Service
@@ -25,24 +27,29 @@ public class UserService extends BaseService {
     @Autowired
     private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String UPLOAD_DIR = "upload/avatar-image";
 
     public UserService(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity<Result> create(UserRequest request) {
+    public ResponseEntity<Result> create(UserRequest request, MultipartFile file) {
         try {
-            return ResponseEntity.ok(new Result("SUCCESS", "OK", createUser(request)));
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", createUser(request, file)));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Result("USERNAME ALREADY EXIST!", "CONFLICT", null));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public ResponseEntity<Result> edit(UserEditRequest request) {
+    public ResponseEntity<Result> edit(UserEditRequest request, MultipartFile file) {
         try {
-            return ResponseEntity.ok(new Result("SUCCESS", "OK", editUser(request)));
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", editUser(request, file)));
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND USER", "NOT_FOUND", null));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -83,7 +90,7 @@ public class UserService extends BaseService {
         return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
     }
 
-    private UserEntity createUser(UserRequest request) {
+    private UserEntity createUser(UserRequest request, MultipartFile file) throws IOException {
         UserEntity user = new UserEntity();
         if (userRepository.existsUserByUsername(request.getUsername())) {
             throw new RuntimeException();
@@ -94,11 +101,12 @@ public class UserService extends BaseService {
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setAddress(request.getAddress());
-        user.setRole(Role.ADMIN);
+        user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
+        user.setRole(Role.MANAGER);
         return userRepository.save(user);
     }
 
-    private UserEntity editUser(UserEditRequest request) {
+    private UserEntity editUser(UserEditRequest request, MultipartFile file) throws IOException {
         UserEntity user = userRepository.findById(request.getId()).orElseThrow(null);
         if (user == null || user.getRole().equals(Role.ADMIN)) {
             throw new NullPointerException();
@@ -108,6 +116,8 @@ public class UserService extends BaseService {
         user.setEmail(request.getEmail());
         user.setAddress(request.getAddress());
         user.setUpdatedDate(new Date());
+        FileService.deleteFile(user.getAvatar());
+        user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
         return userRepository.save(user);
     }
 
