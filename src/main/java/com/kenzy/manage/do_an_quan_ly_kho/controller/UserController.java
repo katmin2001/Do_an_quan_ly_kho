@@ -8,11 +8,12 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-@Controller
+@PreAuthorize("hasAuthority('ADMIN_ROLE')")
+@RestController
 @RequestMapping("/api/admin/user")
 public class UserController {
     @Autowired
