@@ -29,7 +29,7 @@ public class SupplierService extends BaseService {
         }
     }
 
-    public ResponseEntity<Result> delete(Long id) {
+    public ResponseEntity<Result> inactive(Long id) {
         try {
             SupplierEntity supplier = supplierRepository.findById(id).orElseThrow(null);
             supplier.setStatus(false);
@@ -46,6 +46,16 @@ public class SupplierService extends BaseService {
             supplier.setStatus(true);
             supplier.setUpdatedDate(new Date());
             return ResponseEntity.ok(new Result("SUCCESS", "OK", supplierRepository.save(supplier)));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND CATEGORY", "NOT_FOUND", null));
+        }
+    }
+
+    public ResponseEntity<Result> delete(Long id) {
+        try {
+            SupplierEntity supplier = supplierRepository.findById(id).orElseThrow(null);
+            supplierRepository.delete(supplier);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND CATEGORY", "NOT_FOUND", null));
         }

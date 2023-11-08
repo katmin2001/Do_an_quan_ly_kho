@@ -9,9 +9,9 @@ import com.kenzy.manage.do_an_quan_ly_kho.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 @PreAuthorize("hasAuthority('ADMIN_ROLE')")
 @RestController
 @RequestMapping("/api/admin/user")
@@ -41,6 +41,11 @@ public class UserController {
     @PostMapping("/active/{id}")
     public ResponseEntity<Result> active(@PathVariable("id") Long id) {
         return userService.active(id);
+    }
+
+    @PostMapping("/set-role")
+    public ResponseEntity<Result> setRole(@RequestBody UserEditRequest request) {
+        return userService.setRoleUser(request);
     }
 
     @GetMapping("/detail/{id}")

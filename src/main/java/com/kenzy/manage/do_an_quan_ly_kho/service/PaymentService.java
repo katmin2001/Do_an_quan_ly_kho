@@ -51,7 +51,8 @@ public class PaymentService extends BaseService {
 
     public ResponseEntity<Result> deletePayment(Long id) {
         try {
-            return ResponseEntity.ok(new Result("SUCCESS", "OK", delete(id)));
+            delete(id);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
@@ -70,13 +71,12 @@ public class PaymentService extends BaseService {
         return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
     }
 
-    private PaymentEntity delete(Long id) {
+    private void delete(Long id) {
         PaymentEntity payment = paymentRepository.findById(id).orElse(null);
         if (payment == null) {
             throw new NullPointerException("Not found payment");
         }
-        payment.setStatus(false);
-        return paymentRepository.save(payment);
+        paymentRepository.delete(payment);
     }
 
     private PaymentEntity savePayment(PaymentRequest request) {

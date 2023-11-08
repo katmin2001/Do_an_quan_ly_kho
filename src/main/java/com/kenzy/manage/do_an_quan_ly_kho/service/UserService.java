@@ -69,6 +69,14 @@ public class UserService extends BaseService {
         }
     }
 
+    public ResponseEntity<Result> setRoleUser(UserEditRequest request) {
+        try {
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", setRole(request)));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND USER", "NOT_FOUND", null));
+        }
+    }
+
     public ResponseEntity<Result> detail(Long id) {
         try {
             UserEntity user = userRepository.findById(id).orElseThrow(null);
@@ -118,6 +126,15 @@ public class UserService extends BaseService {
         user.setUpdatedDate(new Date());
         FileService.deleteFile(user.getAvatar());
         user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
+        return userRepository.save(user);
+    }
+
+    private UserEntity setRole(UserEditRequest request) {
+        UserEntity user = userRepository.findById(request.getId()).orElseThrow(null);
+        if (user == null || user.getRole().equals(Role.ADMIN)) {
+            throw new NullPointerException();
+        }
+        user.setRole(Role.valueOf(request.getRole()));
         return userRepository.save(user);
     }
 

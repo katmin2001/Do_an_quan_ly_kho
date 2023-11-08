@@ -24,13 +24,18 @@ public class SupplierController {
         return supplierService.createAndEditSupplier(request);
     }
 
-    @GetMapping("/delete/{id}")
-    public ResponseEntity<Result> delete(@PathVariable("id") Long id) {
-        return supplierService.delete(id);
+    @GetMapping("/inactive/{id}")
+    public ResponseEntity<Result> inactive(@PathVariable("id") Long id) {
+        return supplierService.inactive(id);
     }
 
     @GetMapping("/active/{id}")
     public ResponseEntity<Result> active(@PathVariable("id") Long id) {
+        return supplierService.active(id);
+    }
+
+    @GetMapping("/delete/{id}")
+    public ResponseEntity<Result> delete(@PathVariable("id") Long id) {
         return supplierService.active(id);
     }
 
@@ -40,7 +45,7 @@ public class SupplierController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<Result> detail(@PathVariable("id") Long id){
+    public ResponseEntity<Result> detail(@PathVariable("id") Long id) {
         return supplierService.getDetailSupplier(id);
     }
 }

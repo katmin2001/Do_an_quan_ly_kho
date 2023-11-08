@@ -29,13 +29,18 @@ public class ImportReceiptController {
         return importReceiptService.deleteImportReceipt(id);
     }
 
+    @GetMapping("/restore/{id}")
+    public ResponseEntity<Result> restore(@PathVariable("id") Long id) {
+        return importReceiptService.restoreImportReceipt(id);
+    }
+
     @GetMapping("/detail/{id}")
     public ResponseEntity<Result> detail(@PathVariable("id") Long id) {
         return importReceiptService.detailImportReceipt(id);
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Result> search(@RequestBody SearchRequest request){
+    public ResponseEntity<Result> search(@RequestBody SearchRequest request) {
         return importReceiptService.search(request);
     }
 }

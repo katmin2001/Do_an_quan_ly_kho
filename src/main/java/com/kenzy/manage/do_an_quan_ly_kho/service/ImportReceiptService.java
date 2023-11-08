@@ -7,7 +7,10 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ImportReceiptDetailRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ImportReceiptRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.*;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.ImportReceiptDetailResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.ImportReceiptResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ImportReceiptDetailRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ImportReceiptRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ProductRepository;
@@ -49,6 +52,15 @@ public class ImportReceiptService extends BaseService {
         }
     }
 
+    public ResponseEntity<Result> restoreImportReceipt(Long id) {
+        try {
+            restore(id);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("Not found import receipt", "NOT_FOUND", null));
+        }
+    }
+
     public ResponseEntity<Result> detailImportReceipt(Long id) {
         try {
             return ResponseEntity.ok(new Result("SUCCESS", "OK", detail(id)));
@@ -57,12 +69,12 @@ public class ImportReceiptService extends BaseService {
         }
     }
 
-    public ResponseEntity<Result> search(SearchRequest request){
+    public ResponseEntity<Result> search(SearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
         Page<ImportReceiptEntity> page = importReceiptRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), pageable);
         List<ImportReceiptResponse> responses = new ArrayList<>();
-        for(ImportReceiptEntity importReceipt: page){
+        for (ImportReceiptEntity importReceipt : page) {
             List<ImportReceiptDetailEntity> importReceiptDetailList = importReceiptDetailRepository.getImportReceiptDetailEntitiesByImportReceiptId(importReceipt.getId());
             ImportReceiptResponse receiptResponse = new ImportReceiptResponse();
             receiptResponse.setImportDate(importReceipt.getImportDate());
@@ -95,9 +107,24 @@ public class ImportReceiptService extends BaseService {
 
     private void delete(Long id) {
         ImportReceiptEntity importReceipt = importReceiptRepository.findById(id).orElseThrow(null);
+        importReceipt.setStatus(false);
         List<ImportReceiptDetailEntity> importReceiptDetailList = importReceiptDetailRepository.getImportReceiptDetailEntitiesByImportReceiptId(id);
-        importReceiptDetailRepository.deleteAll(importReceiptDetailList);
-        importReceiptRepository.delete(importReceipt);
+        for (ImportReceiptDetailEntity importReceiptDetail : importReceiptDetailList) {
+            importReceiptDetail.setStatus(false);
+        }
+        importReceiptDetailRepository.saveAll(importReceiptDetailList);
+        importReceiptRepository.save(importReceipt);
+    }
+
+    private void restore(Long id) {
+        ImportReceiptEntity importReceipt = importReceiptRepository.findById(id).orElseThrow(null);
+        importReceipt.setStatus(true);
+        List<ImportReceiptDetailEntity> importReceiptDetailList = importReceiptDetailRepository.getImportReceiptDetailEntitiesByImportReceiptId(id);
+        for (ImportReceiptDetailEntity importReceiptDetail : importReceiptDetailList) {
+            importReceiptDetail.setStatus(true);
+        }
+        importReceiptDetailRepository.saveAll(importReceiptDetailList);
+        importReceiptRepository.save(importReceipt);
     }
 
     private ImportReceiptResponse detail(Long id) {

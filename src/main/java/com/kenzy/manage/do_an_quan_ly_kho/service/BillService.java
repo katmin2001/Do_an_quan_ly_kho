@@ -7,7 +7,6 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.BillRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.BillResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.PaymentResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.BillRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.PaymentRepository;
@@ -45,8 +44,8 @@ public class BillService extends BaseService {
             if (bill == null) {
                 throw new NullPointerException("Not found bill");
             }
-            bill.setStatus(false);
-            return ResponseEntity.ok(new Result("SUCCESS", "OK", billRepository.save(bill)));
+            billRepository.delete(bill);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
@@ -60,7 +59,7 @@ public class BillService extends BaseService {
         }
     }
 
-    public ResponseEntity<Result> searchBill(SearchRequest request){
+    public ResponseEntity<Result> searchBill(SearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
         Page<BillEntity> page = billRepository.search(request.getFromDate(), request.getToDate(), pageable);

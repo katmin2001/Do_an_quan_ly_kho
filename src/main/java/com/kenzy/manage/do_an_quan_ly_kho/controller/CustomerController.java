@@ -29,6 +29,11 @@ public class CustomerController {
         return customerService.delete(id);
     }
 
+    @GetMapping("/inactive/{id}")
+    public ResponseEntity<Result> inactive(@PathVariable("id") Long id) {
+        return customerService.inactive(id);
+    }
+
     @GetMapping("/active/{id}")
     public ResponseEntity<Result> active(@PathVariable("id") Long id) {
         return customerService.active(id);

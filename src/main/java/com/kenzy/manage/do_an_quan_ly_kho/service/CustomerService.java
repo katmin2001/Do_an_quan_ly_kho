@@ -29,7 +29,7 @@ public class CustomerService extends BaseService {
         }
     }
 
-    public ResponseEntity<Result> delete(Long id) {
+    public ResponseEntity<Result> inactive(Long id) {
         try {
             CustomerEntity customer = customerRepository.findById(id).orElseThrow(null);
             customer.setStatus(false);
@@ -46,6 +46,16 @@ public class CustomerService extends BaseService {
             customer.setStatus(true);
             customer.setUpdatedDate(new Date());
             return ResponseEntity.ok(new Result("SUCCESS", "OK", customerRepository.save(customer)));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND CUSTOMER", "NOT_FOUND", null));
+        }
+    }
+
+    public ResponseEntity<Result> delete(Long id) {
+        try {
+            CustomerEntity customer = customerRepository.findById(id).orElseThrow(null);
+            customerRepository.delete(customer);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND CUSTOMER", "NOT_FOUND", null));
         }
