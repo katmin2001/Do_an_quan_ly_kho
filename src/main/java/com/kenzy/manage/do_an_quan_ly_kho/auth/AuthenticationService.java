@@ -55,7 +55,7 @@ public class AuthenticationService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             UserEntity user = userRepository.findByUsername(request.getUsername()).orElseThrow(null);
             String jwtToken = jwtService.generateToken(user);
-            return ResponseEntity.ok(AuthenticationResponse.builder().message("Login success").token(jwtToken).build());
+            return ResponseEntity.ok(AuthenticationResponse.builder().message("Login success").token(jwtToken).role(String.valueOf(user.getRole())).build());
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthenticationResponse.builder().message("Invalid username or password").build());
         } catch (Exception e) {
@@ -77,6 +77,5 @@ public class AuthenticationService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 }
