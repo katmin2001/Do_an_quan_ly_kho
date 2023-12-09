@@ -31,7 +31,7 @@ public class SecurityConfiguration {
 //                        .requestMatchers("api/**").hasAnyRole(Role.MANAGER.name())
                         .requestMatchers("/api/auth/login","/register","/upload/**","/api/bill/**",
                                 "/api/category/**","/api/product/**","/api/customer/**","/api/export-receipt/**"
-                        ,"/api/import-receipt/**","/api/order/**","/api/payment/**","/api/supplier/**").permitAll()
+                        ,"/api/import-receipt/**","/api/order/**","/api/payment/**","/api/supplier/**", "/upload/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
