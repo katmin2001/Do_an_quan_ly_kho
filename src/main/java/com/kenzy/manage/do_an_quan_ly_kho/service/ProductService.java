@@ -3,6 +3,7 @@ package com.kenzy.manage.do_an_quan_ly_kho.service;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductSearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.ProductResponse;
@@ -71,10 +72,10 @@ public class ProductService extends BaseService {
         }
     }
 
-    public ResponseEntity<Result> search(SearchRequest request) {
+    public ResponseEntity<Result> search(ProductSearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
-        Page<ProductEntity> page = productRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), pageable);
+        Page<ProductEntity> page = productRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), request.getCategoryId(), request.getSupplierId(), pageable);
         List<ProductResponse> responses = new ArrayList<>();
         for (ProductEntity product : page) {
             ProductResponse response = new ProductResponse();
@@ -129,6 +130,7 @@ public class ProductService extends BaseService {
         } else {
             product = productRepository.findById(request.getId()).orElseThrow(null);
             product.setUpdatedDate(new Date());
+            product.setUpdatedBy(getNameByToken());
             String[] urls = product.getProductImages();
             for (String url : urls) {
                 FileService.deleteFile(url);
@@ -156,6 +158,8 @@ public class ProductService extends BaseService {
         }
         String[] listUrl = productImages.toArray(new String[0]);
         product.setProductImages(listUrl);
+        product.setCreatedBy(getNameByToken());
+        product.setUpdatedBy(getNameByToken());
         return productRepository.save(product);
     }
 }

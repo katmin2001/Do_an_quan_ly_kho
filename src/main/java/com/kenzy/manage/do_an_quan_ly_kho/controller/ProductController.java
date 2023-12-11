@@ -2,6 +2,7 @@ package com.kenzy.manage.do_an_quan_ly_kho.controller;
 
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductRequest;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductSearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class ProductController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Result> search(@RequestBody SearchRequest request) {
+    public ResponseEntity<Result> search(@RequestBody ProductSearchRequest request) {
         return productService.search(request);
     }
 

@@ -1,7 +1,10 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
+import com.kenzy.manage.do_an_quan_ly_kho.config.JwtService;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Constants;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +17,13 @@ import java.util.List;
 
 public abstract class BaseService {
     public static final Logger LOGGER = LoggerFactory.getLogger(BaseService.class);
+    @Resource
+    private JwtService jwtService;
+    @Resource
+    private UserService userService;
+    @Resource
+    private HttpServletRequest httpServletRequest;
+
     protected Pageable buildPageable(MetaList metaList, String sortDefault, boolean isDesc) {
         if (ObjectUtils.isEmpty(metaList)) {
             return Pageable.unpaged();
@@ -53,5 +63,11 @@ public abstract class BaseService {
         Integer pageNum = pageable.isUnpaged() ? Constants.PAGE_NUM_DEFAULT : pageable.getPageNumber();
         Integer pageSize = pageable.isUnpaged() ? Constants.PAGE_SIZE_DEFAULT : pageable.getPageSize();
         return MetaList.builder().pageNum(pageNum).pageSize(pageSize).total(total).build();
+    }
+
+    protected String getNameByToken(){
+        String token = httpServletRequest.getHeader("Authorization").substring(7);
+        String username = jwtService.extractUsername(token);
+        return username;
     }
 }

@@ -94,6 +94,8 @@ public class CustomerService extends BaseService {
         customer.setPhone(request.getPhone());
         customer.setEmail(request.getEmail());
         customer.setAddress(request.getAddress());
+        customer.setCreatedBy(getNameByToken());
+        customer.setUpdatedBy(getNameByToken());
         return customerRepository.save(customer);
     }
 }

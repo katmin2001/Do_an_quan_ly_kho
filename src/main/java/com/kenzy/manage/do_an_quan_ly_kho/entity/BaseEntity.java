@@ -23,5 +23,5 @@ public abstract class BaseEntity {
     @Column(name = "created_by", nullable = true)
     private String createdBy;
     @Column(name = "updated_by", nullable = true)
-    private Date updatedBy;
+    private String updatedBy;
 }

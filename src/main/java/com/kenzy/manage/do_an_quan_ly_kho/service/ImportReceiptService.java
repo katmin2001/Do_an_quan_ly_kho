@@ -175,6 +175,8 @@ public class ImportReceiptService extends BaseService {
         }
         importReceipt.setImportDate(new Date());
         importReceipt.setName(request.getName());
+        importReceipt.setCreatedBy(getNameByToken());
+        importReceipt.setUpdatedBy(getNameByToken());
         importReceiptRepository.save(importReceipt);
         for (ImportReceiptDetailRequest receiptDetailRequest : request.getImportReceiptDetailRequest()) {
             ImportReceiptDetailEntity importReceiptDetail = new ImportReceiptDetailEntity();
@@ -189,6 +191,8 @@ public class ImportReceiptService extends BaseService {
             importReceiptDetail.setTotalPrice(totalPrice);
             importReceiptDetail.setImportReceiptId(importReceipt.getId());
             importReceiptDetail.setUpdatedDate(new Date());
+            importReceiptDetail.setUpdatedBy(getNameByToken());
+            importReceiptDetail.setCreatedBy(getNameByToken());
             importReceiptDetailList.add(importReceiptDetail);
         }
         return importReceiptDetailRepository.saveAll(importReceiptDetailList);

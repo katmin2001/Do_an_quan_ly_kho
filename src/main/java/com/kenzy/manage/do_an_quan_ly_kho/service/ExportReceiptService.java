@@ -179,6 +179,8 @@ public class ExportReceiptService extends BaseService {
         }
         exportReceipt.setExportDate(request.getExportDate());
         exportReceipt.setName(request.getName());
+        exportReceipt.setCreatedBy(getNameByToken());
+        exportReceipt.setUpdatedBy(getNameByToken());
         exportReceiptRepository.save(exportReceipt);
         List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(request.getOrderId());
         for (OrderDetailEntity orderDetail : orderDetailEntityList) {
@@ -205,6 +207,8 @@ public class ExportReceiptService extends BaseService {
             exportReceiptDetail.setCreatedDate(new Date());
             exportReceiptDetail.setUnitPrice(product.getPrice());
             exportReceiptDetail.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(orderDetail.getQuantity())));
+            exportReceiptDetail.setUpdatedBy(getNameByToken());
+            exportReceiptDetail.setCreatedBy(getNameByToken());
             exportReceiptDetailEntityList.add(exportReceiptDetail);
         }
         return exportReceiptDetailRepository.saveAll(exportReceiptDetailEntityList);

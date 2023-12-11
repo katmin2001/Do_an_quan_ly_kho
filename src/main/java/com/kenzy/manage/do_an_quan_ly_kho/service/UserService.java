@@ -111,6 +111,7 @@ public class UserService extends BaseService {
         user.setAddress(request.getAddress());
         user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
         user.setRole(Role.MANAGER);
+        user.setCreatedBy(getNameByToken());
         return userRepository.save(user);
     }
 
@@ -126,6 +127,7 @@ public class UserService extends BaseService {
         user.setUpdatedDate(new Date());
         FileService.deleteFile(user.getAvatar());
         user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
+        user.setUpdatedBy(getNameByToken());
         return userRepository.save(user);
     }
 
@@ -135,6 +137,7 @@ public class UserService extends BaseService {
             throw new NullPointerException();
         }
         user.setRole(Role.valueOf(request.getRole()));
+        user.setUpdatedBy(getNameByToken());
         return userRepository.save(user);
     }
 

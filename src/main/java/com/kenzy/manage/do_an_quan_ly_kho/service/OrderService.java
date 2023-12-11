@@ -75,10 +75,12 @@ public class OrderService extends BaseService {
             orderDetailRepository.deleteAll(orderDetailEntityList);
             orderDetailEntityList.clear();
             order.setUpdatedDate(new Date());
+            order.setUpdatedBy(getNameByToken());
         }
         order.setOrderDate(new Date());
         order.setOrderStatus(OrderStatus.IN_PROGRESS.getName());
         order.setCustomerId(request.getCustomerId());
+        order.setCreatedBy(getNameByToken());
         orderRepository.save(order);
         BigDecimal totalAmount = BigDecimal.valueOf(0);
         for (OrderProductRequest productRequest : request.getOrderProductRequestList()) {
@@ -105,6 +107,8 @@ public class OrderService extends BaseService {
             BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
             orderDetail.setTotalPrice(totalPrice);
             totalAmount = totalAmount.add(totalPrice);
+            orderDetail.setCreatedBy(getNameByToken());
+            orderDetail.setUpdatedBy(getNameByToken());
             orderDetailEntityList.add(orderDetail);
         }
         order.setTotalAmount(totalAmount);
@@ -165,7 +169,7 @@ public class OrderService extends BaseService {
         }
     }
 
-    private OrderResponse detail(Long id) {
+    public OrderResponse detail(Long id) {
         OrderEntity order = orderRepository.findById(id).orElse(null);
         if (order == null) {
             throw new NullPointerException("Not found order");

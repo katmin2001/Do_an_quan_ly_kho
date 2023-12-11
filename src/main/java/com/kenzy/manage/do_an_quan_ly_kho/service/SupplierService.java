@@ -94,6 +94,8 @@ public class SupplierService extends BaseService {
         supplier.setPhone(request.getPhone());
         supplier.setEmail(request.getEmail());
         supplier.setAddress(request.getAddress());
+        supplier.setCreatedBy(getNameByToken());
+        supplier.setUpdatedBy(getNameByToken());
         return supplierRepository.save(supplier);
     }
 

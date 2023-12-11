@@ -7,6 +7,8 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.CategoryRepository;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -80,6 +82,8 @@ public class CategoryService extends BaseService {
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
         category.setCategoryImage(FileService.uploadFile(file, UPLOAD_DIR));
+        category.setCreatedBy(getNameByToken());
+        category.setUpdatedBy(getNameByToken());
         return categoryRepository.save(category);
     }
 }

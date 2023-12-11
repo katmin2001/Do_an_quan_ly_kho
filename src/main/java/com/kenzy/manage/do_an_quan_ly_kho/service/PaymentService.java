@@ -98,6 +98,8 @@ public class PaymentService extends BaseService {
             throw new NullPointerException("Not found order");
         }
         payment.setPaymentAmount(order.getTotalAmount());
+        payment.setCreatedBy(getNameByToken());
+        payment.setUpdatedBy(getNameByToken());
         return paymentRepository.save(payment);
     }
 

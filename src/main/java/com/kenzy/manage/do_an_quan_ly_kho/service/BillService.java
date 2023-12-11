@@ -5,11 +5,12 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.PaymentEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.BillRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.BillResponse;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
-import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.*;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.BillRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.PaymentRepository;
+import com.kenzy.manage.do_an_quan_ly_kho.repository.ProductRepository;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,10 @@ public class BillService extends BaseService {
     private PaymentRepository paymentRepository;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private OrderService orderService;
 
     public ResponseEntity<Result> createAndEdit(BillRequest request) {
         try {
@@ -82,6 +87,9 @@ public class BillService extends BaseService {
         response.setCreatedDate(bill.getCreatedDate());
         response.setCreatedBy(bill.getCreatedBy());
         response.setPaymentResponse(paymentService.detail(bill.getPaymentId()));
+        PaymentEntity payment = paymentRepository.findById(bill.getPaymentId()).orElse(null);
+        OrderResponse orderResponse = orderService.detail(payment.getOrderId());
+        response.setOrderResponse(orderResponse);
         return response;
     }
 
@@ -102,6 +110,8 @@ public class BillService extends BaseService {
         }
         bill.setPaymentId(request.getPaymentId());
         bill.setTotalPrice(payment.getPaymentAmount());
+        bill.setCreatedBy(getNameByToken());
+        bill.setUpdatedBy(getNameByToken());
         return billRepository.save(bill);
     }
 }
