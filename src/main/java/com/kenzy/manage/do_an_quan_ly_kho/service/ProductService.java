@@ -8,9 +8,7 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.ProductResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
-import com.kenzy.manage.do_an_quan_ly_kho.repository.CategoryRepository;
-import com.kenzy.manage.do_an_quan_ly_kho.repository.ProductRepository;
-import com.kenzy.manage.do_an_quan_ly_kho.repository.SupplierRepository;
+import com.kenzy.manage.do_an_quan_ly_kho.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +33,10 @@ public class ProductService extends BaseService {
     private CategoryRepository categoryRepository;
     @Autowired
     private SupplierRepository supplierRepository;
+    @Autowired
+    private ImportReceiptDetailRepository importReceiptDetailRepository;
+    @Autowired
+    private ExportReceiptDetailRepository exportReceiptDetailRepository;
 
     public ResponseEntity<Result> createAndEditProduct(ProductRequest request, List<MultipartFile> files) {
         try {
@@ -79,6 +81,15 @@ public class ProductService extends BaseService {
         List<ProductResponse> responses = new ArrayList<>();
         for (ProductEntity product : page) {
             ProductResponse response = new ProductResponse();
+            Integer quantityInWareHouse = importReceiptDetailRepository.getQuantityProductInWareHouseById(product.getId());
+            if (quantityInWareHouse == null) {
+                quantityInWareHouse = 0;
+            }
+            Integer quantityExport = exportReceiptDetailRepository.getQuantityProductExportById(product.getId());
+            if (quantityExport == null) {
+                quantityExport = 0;
+            }
+            response.setQuantity(quantityInWareHouse - quantityExport);
             response.setProductName(product.getProductName());
             response.setId(product.getId());
             response.setPrice(product.getPrice());

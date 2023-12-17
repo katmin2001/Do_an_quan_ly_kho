@@ -19,6 +19,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tp.created_date <= :toDate) " +
             "AND (LOWER(tp.product_name) like CONCAT('%', LOWER(:keyword), '%')) " +
             "AND (:categoryId IS NULL OR tp.category_id <= :categoryId) " +
-            "AND (:supplierId IS NULL OR tp.supplier_id <= :supplierId) ", nativeQuery = true)
+            "AND (:supplierId IS NULL OR tp.supplier_id <= :supplierId) AND tp.status = true ", nativeQuery = true)
     Page<ProductEntity> search(String keyword, Date fromDate, Date toDate, Long categoryId, Long supplierId, Pageable pageable);
 }

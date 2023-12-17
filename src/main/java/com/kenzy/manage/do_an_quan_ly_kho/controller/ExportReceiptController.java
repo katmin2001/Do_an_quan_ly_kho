@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/export_receipt")
+@RequestMapping("/api/export-receipt")
 public class ExportReceiptController {
     @Autowired
     private ExportReceiptService exportReceiptService;

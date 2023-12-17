@@ -27,7 +27,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//                        .requestMatchers("api/admin/**").hasAnyRole(Role.ADMIN.name())
+                        .requestMatchers("api/admin/**").hasAnyRole(Role.ADMIN.name())
 //                        .requestMatchers("api/**").hasAnyRole(Role.MANAGER.name())
                         .requestMatchers("/api/auth/login","/register","/upload/**","/api/bill/**",
                                 "/api/category/**","/api/product/**","/api/customer/**","/api/export-receipt/**"
