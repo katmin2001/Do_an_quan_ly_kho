@@ -27,8 +27,6 @@ public class ExportReceiptDetailEntity extends BaseEntity{
     private BigDecimal totalPrice;
     @Column(name = "unit_price")
     private BigDecimal unitPrice;
-    @Column(name = "order_id")
-    private Long orderId;
     @Column(name = "import_receipt_id")
     private Long importReceiptId;
 }

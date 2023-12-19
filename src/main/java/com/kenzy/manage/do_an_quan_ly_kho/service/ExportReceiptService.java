@@ -1,6 +1,9 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
-import com.kenzy.manage.do_an_quan_ly_kho.entity.*;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.ExportReceiptDetailEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.ExportReceiptEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderDetailEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ExportReceiptRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
@@ -107,6 +110,13 @@ public class ExportReceiptService extends BaseService {
         response.setCreatedDate(exportReceipt.getCreatedDate());
         response.setStatus(exportReceipt.getStatus());
         response.setTotalPrice(totalPrice(exportReceipt.getId()));
+        response.setOrderId(exportReceipt.getOrderId());
+        List<ExportReceiptDetailResponse> exportReceiptDetailResponseList = new ArrayList<>();
+        List<ExportReceiptDetailEntity> exportReceiptDetailEntityList = exportReceiptDetailRepository.findExportReceiptDetailEntitiesByExportReceiptId(exportReceipt.getId());
+        for (ExportReceiptDetailEntity exportReceiptDetail : exportReceiptDetailEntityList) {
+            exportReceiptDetailResponseList.add(mapperExportReceiptDetail(exportReceiptDetail));
+        }
+        response.setExportReceiptDetailResponseList(exportReceiptDetailResponseList);
         return response;
     }
 
@@ -124,13 +134,13 @@ public class ExportReceiptService extends BaseService {
         response.setId(exportReceiptDetail.getId());
         response.setQuantity(exportReceiptDetail.getQuantity());
         response.setUnitPrice(exportReceiptDetail.getUnitPrice());
-        response.setTotalPrice(exportReceiptDetail.getTotalPrice());
-        response.setProductResponse(productService.detailProduct(exportReceiptDetail.getProductId()));
-        OrderEntity order = orderRepository.findById(exportReceiptDetail.getOrderId()).orElse(null);
-        if (order == null) {
-            throw new NullPointerException("Not found order");
+        response.setTotalPriceProduct(exportReceiptDetail.getTotalPrice());
+        ProductEntity product = productRepository.findById(exportReceiptDetail.getProductId()).orElse(null);
+        if (product == null) {
+            throw new NullPointerException("Not found product");
         }
-        response.setOrder(order);
+        response.setProductName(product.getProductName());
+        response.setImageUrls(List.of(product.getProductImages()));
         return response;
     }
 
@@ -179,6 +189,7 @@ public class ExportReceiptService extends BaseService {
         }
         exportReceipt.setExportDate(request.getExportDate());
         exportReceipt.setName(request.getName());
+        exportReceipt.setOrderId(request.getOrderId());
         exportReceipt.setCreatedBy(getNameByToken());
         exportReceipt.setUpdatedBy(getNameByToken());
         exportReceiptRepository.save(exportReceipt);
@@ -202,7 +213,6 @@ public class ExportReceiptService extends BaseService {
             }
             exportReceiptDetail.setExportReceiptId(exportReceipt.getId());
             exportReceiptDetail.setProductId(orderDetail.getProductId());
-            exportReceiptDetail.setOrderId(request.getOrderId());
             exportReceiptDetail.setQuantity(orderDetail.getQuantity());
             exportReceiptDetail.setCreatedDate(new Date());
             exportReceiptDetail.setUnitPrice(product.getPrice());

@@ -92,6 +92,7 @@ public class ImportReceiptService extends BaseService {
                 detailResponse.setPriceUnit(product.getPrice());
                 detailResponse.setId(receiptDetail.getId());
                 detailResponse.setQuantity(receiptDetail.getQuantity());
+                detailResponse.setImageUrls(List.of(product.getProductImages()));
                 detailResponse.setTotalPriceProduct(product.getPrice().multiply(BigDecimal.valueOf(receiptDetail.getQuantity())));
                 totalPrice = totalPrice.add(detailResponse.getTotalPriceProduct());
                 importReceiptDetailResponseList.add(detailResponse);

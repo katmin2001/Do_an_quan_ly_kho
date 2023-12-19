@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class ExportReceiptResponse {
@@ -14,4 +15,6 @@ public class ExportReceiptResponse {
     private String name;
     private Boolean status;
     private BigDecimal totalPrice;
+    private Long orderId;
+    private List<ExportReceiptDetailResponse> exportReceiptDetailResponseList;
 }

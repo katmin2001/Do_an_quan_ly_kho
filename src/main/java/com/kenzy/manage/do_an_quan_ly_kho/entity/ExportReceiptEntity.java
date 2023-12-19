@@ -21,6 +21,8 @@ public class ExportReceiptEntity extends BaseEntity{
     private Date exportDate;
     @Column(name = "name")
     private String name;
+    @Column(name = "order_id")
+    private Long orderId;
     @Column(name = "ware_house_id")
     private Long wareHouseId;
 }
