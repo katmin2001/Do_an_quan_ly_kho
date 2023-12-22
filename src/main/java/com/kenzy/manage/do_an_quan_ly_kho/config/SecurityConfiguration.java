@@ -26,13 +26,14 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("api/admin/**").hasAnyRole(Role.ADMIN.name())
-//                        .requestMatchers("api/**").hasAnyRole(Role.MANAGER.name())
-                        .requestMatchers("/api/auth/login","/register","/upload/**","/api/bill/**",
-                                "/api/category/**","/api/product/**","/api/customer/**","/api/export-receipt/**"
-                        ,"/api/import-receipt/**","/api/order/**","/api/payment/**","/api/supplier/**", "/upload/**").permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers("api/admin/**").hasAnyRole(Role.ADMIN.name())
+                                .requestMatchers("/api/auth/login", "/register", "/upload/**"
+//                                        , "/api/bill/**", "/api/category/**", "/api/product/**", "/api/customer/**", "/api/export-receipt/**"
+//                                        , "/api/import-receipt/**", "/api/order/**", "/api/payment/**", "/api/supplier/**", "/api/statistic/**"
+                                ).permitAll()
+                                .requestMatchers("api/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

@@ -12,4 +12,5 @@ public class ImportReceiptResponse {
     private Date importDate;
     private List<ImportReceiptDetailResponse> importReceiptDetailResponseList;
     private BigDecimal totalPrice;
+    private Boolean status;
 }

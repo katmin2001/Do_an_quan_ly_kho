@@ -99,6 +99,7 @@ public class ImportReceiptService extends BaseService {
             }
             receiptResponse.setTotalPrice(totalPrice);
             receiptResponse.setImportReceiptDetailResponseList(importReceiptDetailResponseList);
+            receiptResponse.setStatus(importReceipt.getStatus());
             responses.add(receiptResponse);
         }
         metaList.setTotal(page.getTotalElements());
