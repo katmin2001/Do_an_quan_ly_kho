@@ -18,7 +18,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     @Query(value = "SELECT * FROM quan_ly_kho.tbl_category tc " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tc.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tc.created_date <= :toDate) " +
-            "AND (LOWER(tc.name) like CONCAT('%', LOWER(:keyword), '%') or tc.description like CONCAT('%', LOWER(:keyword), '%')) ",
+            "AND (LOWER(tc.name) like CONCAT('%', LOWER(:keyword), '%') or tc.description like CONCAT('%', LOWER(:keyword), '%')) and tc.status = true ",
             nativeQuery = true)
     Page<CategoryEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 

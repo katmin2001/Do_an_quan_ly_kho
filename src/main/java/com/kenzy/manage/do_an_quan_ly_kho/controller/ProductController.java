@@ -21,7 +21,7 @@ public class ProductController {
 
     @PostMapping("/create")
     public ResponseEntity<Result> create(@RequestPart ProductRequest request,
-                                         @RequestPart List<MultipartFile> files) {
+                                         @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         return productService.createAndEditProduct(request, files);
     }
 

@@ -23,7 +23,7 @@ public class ProductEntity extends BaseEntity{
     private String description;
     @Column(name = "price")
     private BigDecimal price;
-    @Column(name = "product_images")
+    @Column(name = "product_images", columnDefinition = "varbinary(10000)")
     private String[] productImages;
     @Column(name = "supplier_id")
     private Long supplierId;

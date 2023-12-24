@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -140,7 +141,7 @@ public class ExportReceiptService extends BaseService {
             throw new NullPointerException("Not found product");
         }
         response.setProductName(product.getProductName());
-        response.setImageUrls(List.of(product.getProductImages()));
+        response.setImageUrls(List.of(Arrays.toString(product.getProductImages())));
         return response;
     }
 

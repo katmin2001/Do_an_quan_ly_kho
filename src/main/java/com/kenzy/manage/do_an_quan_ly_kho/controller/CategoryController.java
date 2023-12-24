@@ -19,7 +19,7 @@ public class CategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<Result> createCategory(@RequestPart CategoryRequest category,
-                                                 @RequestPart MultipartFile file) throws IOException {
+                                                 @RequestPart(value = "file", required = false) MultipartFile file ) throws IOException {
         return categoryService.createAndEditCategory(category, file);
     }
 
@@ -32,6 +32,11 @@ public class CategoryController {
     @GetMapping("/delete/{id}")
     public ResponseEntity<Result> deleteCategory(@PathVariable("id") Long id) {
         return categoryService.deleteCategory(id);
+    }
+
+    @GetMapping("/inactive/{id}")
+    public ResponseEntity<Result> inactiveCategory(@PathVariable("id") Long id) {
+        return categoryService.inactive(id);
     }
 
     @PostMapping("/search")

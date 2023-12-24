@@ -7,8 +7,6 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.CategoryRepository;
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,6 +47,17 @@ public class CategoryService extends BaseService {
         }
     }
 
+    public ResponseEntity<Result> inactive(Long categoryId) {
+        try {
+            CategoryEntity category = categoryRepository.findById(categoryId).orElseThrow(null);
+            category.setStatus(false);
+            categoryRepository.save(category);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("NOT FOUND CATEGORY", "NOT_FOUND", null));
+        }
+    }
+
     public ResponseEntity<Result> searchCategory(SearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
@@ -76,12 +85,16 @@ public class CategoryService extends BaseService {
             if (category == null) {
                 throw new NullPointerException("Not found category!");
             }
-            FileService.deleteFile(category.getCategoryImage());
+            if (file != null) {
+                FileService.deleteFile(category.getCategoryImage());
+            }
             category.setUpdatedDate(new Date());
         }
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
-        category.setCategoryImage(FileService.uploadFile(file, UPLOAD_DIR));
+        if (file != null) {
+            category.setCategoryImage(FileService.uploadFile(file, UPLOAD_DIR));
+        }
         category.setCreatedBy(getNameByToken());
         category.setUpdatedBy(getNameByToken());
         return categoryRepository.save(category);

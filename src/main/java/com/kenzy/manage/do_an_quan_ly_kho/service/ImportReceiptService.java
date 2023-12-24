@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class ImportReceiptService extends BaseService {
                 detailResponse.setPriceUnit(product.getPrice());
                 detailResponse.setId(receiptDetail.getId());
                 detailResponse.setQuantity(receiptDetail.getQuantity());
-                detailResponse.setImageUrls(List.of(product.getProductImages()));
+                detailResponse.setImageUrls(List.of(Arrays.toString(product.getProductImages())));
                 detailResponse.setTotalPriceProduct(product.getPrice().multiply(BigDecimal.valueOf(receiptDetail.getQuantity())));
                 totalPrice = totalPrice.add(detailResponse.getTotalPriceProduct());
                 importReceiptDetailResponseList.add(detailResponse);

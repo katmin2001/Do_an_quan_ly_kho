@@ -4,7 +4,6 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductSearchRequest;
-import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.ProductResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
@@ -20,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -138,14 +138,41 @@ public class ProductService extends BaseService {
         ProductEntity product = null;
         if (request.getId() == null) {
             product = new ProductEntity();
+            if (files != null) {
+                List<String> productImages = new ArrayList<>();
+                if (files.size() != 0 && !files.get(0).getOriginalFilename().equals("")) {
+                    for (MultipartFile file : files) {
+                        String url = FileService.uploadFile(file, UPLOAD_DIR);
+                        productImages.add(url);
+                    }
+                }
+                String[] listUrl = productImages.toArray(new String[0]);
+                product.setProductImages(listUrl);
+            }
         } else {
             product = productRepository.findById(request.getId()).orElseThrow(null);
             product.setUpdatedDate(new Date());
             product.setUpdatedBy(getNameByToken());
-            String[] urls = product.getProductImages();
+            List<String> urls = new ArrayList<>(Arrays.asList(product.getProductImages()));
+            List<String> imageUrls = new ArrayList<>(Arrays.asList(request.getProductImages()));
+            List<String> newUrls = new ArrayList<>();
             for (String url : urls) {
-                FileService.deleteFile(url);
+                if (imageUrls.contains(url)) {
+                    newUrls.add(url);
+                }
+                else {
+                    FileService.deleteFile(url);
+                }
             }
+            if (files != null) {
+                if (files.size() != 0 && !files.get(0).getOriginalFilename().equals("")) {
+                    for (MultipartFile file : files) {
+                        String url = FileService.uploadFile(file, UPLOAD_DIR);
+                        newUrls.add(url);
+                    }
+                }
+            }
+            product.setProductImages(newUrls.toArray(new String[0]));
         }
         product.setProductName(request.getProductName());
         product.setPrice(request.getPrice());
@@ -160,15 +187,6 @@ public class ProductService extends BaseService {
         } else {
             throw new RuntimeException("Not found supplier");
         }
-        List<String> productImages = new ArrayList<>();
-        if (files.size() != 0 && !files.get(0).getOriginalFilename().equals("")) {
-            for (MultipartFile file : files) {
-                String url = FileService.uploadFile(file, UPLOAD_DIR);
-                productImages.add(url);
-            }
-        }
-        String[] listUrl = productImages.toArray(new String[0]);
-        product.setProductImages(listUrl);
         product.setCreatedBy(getNameByToken());
         product.setUpdatedBy(getNameByToken());
         return productRepository.save(product);
