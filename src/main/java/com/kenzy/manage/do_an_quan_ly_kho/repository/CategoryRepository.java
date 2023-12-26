@@ -34,6 +34,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
             "  quan_ly_kho.tbl_export_receipt_detail terd ON tp.id = terd.product_id AND terd.status = true\n" +
             "LEFT JOIN\n" +
             "  quan_ly_kho.tbl_import_receipt_detail tird ON tp.id = tird.product_id\n" +
+            "WHERE tc.status = true " +
             "GROUP BY\n" +
             "  tc.name ", nativeQuery = true)
     List<IGetStatisticByCategoryOrProduct> getStatisticByCategory();

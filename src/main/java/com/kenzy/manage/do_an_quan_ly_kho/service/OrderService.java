@@ -38,8 +38,8 @@ public class OrderService extends BaseService {
     private OrderRepository orderRepository;
     @Autowired
     private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private PaymentRepository paymentRepository;
+//    @Autowired
+//    private uePaymentRepository paymentRepository;
     @Autowired
     private BillRepository billRepository;
     @Autowired

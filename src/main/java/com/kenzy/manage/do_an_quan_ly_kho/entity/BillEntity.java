@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @Builder
@@ -19,6 +20,12 @@ import java.math.BigDecimal;
 public class BillEntity extends BaseEntity{
     @Column(name = "total_price")
     private BigDecimal totalPrice;
-    @Column(name = "payment_id")
-    private Long paymentId;
+    @Column(name = "payment_amount")
+    private BigDecimal paymentAmount;
+    @Column(name = "payment_method")
+    private String paymentMethod;
+    @Column(name = "payment_date")
+    private Date paymentDate;
+    @Column(name = "order_id")
+    private Long orderId;
 }

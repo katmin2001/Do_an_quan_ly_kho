@@ -1,7 +1,6 @@
 package com.kenzy.manage.do_an_quan_ly_kho.repository;
 
 import com.kenzy.manage.do_an_quan_ly_kho.entity.BillEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.PaymentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

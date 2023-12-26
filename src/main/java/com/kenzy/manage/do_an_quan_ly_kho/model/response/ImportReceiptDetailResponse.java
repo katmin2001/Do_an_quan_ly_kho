@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class ImportReceiptDetailResponse {
     private Long id;
+    private Long productId;
     private String productName;
     private BigDecimal priceUnit;
     private long quantity;

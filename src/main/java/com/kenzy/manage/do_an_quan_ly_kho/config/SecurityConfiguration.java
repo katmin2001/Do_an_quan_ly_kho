@@ -33,7 +33,7 @@ public class SecurityConfiguration {
 //                                        , "/api/bill/**", "/api/category/**", "/api/product/**", "/api/customer/**", "/api/export-receipt/**"
 //                                        , "/api/import-receipt/**", "/api/order/**", "/api/payment/**", "/api/supplier/**", "/api/statistic/**"
                                 ).permitAll()
-                                .requestMatchers("api/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
+                                .requestMatchers("api/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

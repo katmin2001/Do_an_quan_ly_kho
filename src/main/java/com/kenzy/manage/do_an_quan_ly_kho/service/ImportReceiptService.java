@@ -89,12 +89,13 @@ public class ImportReceiptService extends BaseService {
                 if (product == null) {
                     throw new NullPointerException("Not found product");
                 }
+                detailResponse.setProductId(product.getId());
                 detailResponse.setProductName(product.getProductName());
-                detailResponse.setPriceUnit(product.getPrice());
+                detailResponse.setPriceUnit(receiptDetail.getUnitPrice());
                 detailResponse.setId(receiptDetail.getId());
                 detailResponse.setQuantity(receiptDetail.getQuantity());
-                detailResponse.setImageUrls(List.of(Arrays.toString(product.getProductImages())));
-                detailResponse.setTotalPriceProduct(product.getPrice().multiply(BigDecimal.valueOf(receiptDetail.getQuantity())));
+                detailResponse.setImageUrls(List.of(product.getProductImages()));
+                detailResponse.setTotalPriceProduct(receiptDetail.getTotalPrice());
                 totalPrice = totalPrice.add(detailResponse.getTotalPriceProduct());
                 importReceiptDetailResponseList.add(detailResponse);
             }

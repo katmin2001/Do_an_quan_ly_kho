@@ -110,7 +110,7 @@ public class UserService extends BaseService {
         user.setEmail(request.getEmail());
         user.setAddress(request.getAddress());
         user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
-        user.setRole(Role.MANAGER);
+        user.setRole(Role.USER);
         user.setCreatedBy(getNameByToken());
         return userRepository.save(user);
     }

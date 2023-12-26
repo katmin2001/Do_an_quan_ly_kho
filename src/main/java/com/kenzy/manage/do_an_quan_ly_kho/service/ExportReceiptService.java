@@ -141,7 +141,7 @@ public class ExportReceiptService extends BaseService {
             throw new NullPointerException("Not found product");
         }
         response.setProductName(product.getProductName());
-        response.setImageUrls(List.of(Arrays.toString(product.getProductImages())));
+        response.setImageUrls(List.of(product.getProductImages()));
         return response;
     }
 

@@ -38,7 +38,7 @@ public class AuthenticationService {
                     .email(request.getEmail())
                     .phone(request.getPhone())
                     .address(request.getAddress())
-                    .role(request.getRole().equals("ADMIN") ? Role.ADMIN : Role.MANAGER)
+                    .role(request.getRole().equals("ADMIN") ? Role.ADMIN : Role.USER)
                     .build();
             user.setCreatedDate(new Date());
             user.setUpdatedDate(new Date());

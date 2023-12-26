@@ -30,9 +30,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             "FROM\n" +
             "  quan_ly_kho.tbl_product tp\n" +
             "LEFT JOIN\n" +
-            "  quan_ly_kho.tbl_export_receipt_detail terd ON tp.id = terd.product_id AND terd.status = true\n" +
+            "  quan_ly_kho.tbl_export_receipt_detail terd ON tp.id = terd.product_id AND terd.status = true \n" +
             "LEFT JOIN\n" +
             "  quan_ly_kho.tbl_import_receipt_detail tird ON tp.id = tird.product_id\n" +
+            "WHERE tp.status = true " +
             "GROUP BY\n" +
             "  tp.product_name ", nativeQuery = true)
     List<IGetStatisticByCategoryOrProduct> getStatisticByProduct();
