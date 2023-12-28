@@ -1,9 +1,6 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
-import com.kenzy.manage.do_an_quan_ly_kho.entity.CustomerEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderDetailEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.*;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.OrderStatus;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.OrderProductRequest;
@@ -38,8 +35,6 @@ public class OrderService extends BaseService {
     private OrderRepository orderRepository;
     @Autowired
     private OrderDetailRepository orderDetailRepository;
-//    @Autowired
-//    private uePaymentRepository paymentRepository;
     @Autowired
     private BillRepository billRepository;
     @Autowired
@@ -63,22 +58,38 @@ public class OrderService extends BaseService {
 
     private List<OrderDetailEntity> createAndUpdateOrder(OrderRequest request) {
         OrderEntity order = null;
+        BillEntity bill = null;
+        boolean isCreate = true;
         List<OrderDetailEntity> orderDetailEntityList = new ArrayList<>();
         if (request.getId() == null) {
             order = new OrderEntity();
+            order.setOrderStatus(OrderStatus.IN_PROGRESS.getType());
+            bill = new BillEntity();
+            bill.setCreatedBy(getNameByToken());
+            bill.setCreatedDate(new Date());
         } else {
+            isCreate = false;
             order = orderRepository.findById(request.getId()).orElse(null);
             if (order == null) {
                 throw new NullPointerException("Not found order");
+            }
+            if (order.getOrderStatus() == OrderStatus.CANCEL.getType() || order.getOrderStatus() == OrderStatus.RETURNED_REFUNDED.getType()) {
+                throw new RuntimeException("Canceled orders cannot be edited");
+            }
+            if (order.getOrderStatus() == OrderStatus.SHIPPING.getType() && request.getOrderStatus() == OrderStatus.IN_PROGRESS.getType()) {
+                throw new RuntimeException("Shipping orders cannot be edited to process");
             }
             orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(request.getId());
             orderDetailRepository.deleteAll(orderDetailEntityList);
             orderDetailEntityList.clear();
             order.setUpdatedDate(new Date());
             order.setUpdatedBy(getNameByToken());
+            order.setOrderStatus(request.getOrderStatus());
+            bill = billRepository.findBillEntityByOrderId(order.getId());
+            bill.setUpdatedBy(getNameByToken());
+            bill.setUpdatedDate(new Date());
         }
         order.setOrderDate(new Date());
-        order.setOrderStatus(OrderStatus.IN_PROGRESS.getName());
         order.setCustomerId(request.getCustomerId());
         order.setCreatedBy(getNameByToken());
         orderRepository.save(order);
@@ -100,8 +111,12 @@ public class OrderService extends BaseService {
                 quantityExport = 0;
             }
             if ((quantityInWareHouse - quantityExport) < productRequest.getQuantity()) {
-                orderRepository.deleteById(order.getId());
-                throw new RuntimeException("Not enough product: " + product.getProductName());
+                if (isCreate) {
+                    orderRepository.deleteById(order.getId());
+                    throw new RuntimeException("Not enough product: " + product.getProductName());
+                } else {
+                    throw new RuntimeException("Not enough product: " + product.getProductName());
+                }
             }
             orderDetail.setOrderId(order.getId());
             BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
@@ -113,6 +128,13 @@ public class OrderService extends BaseService {
         }
         order.setTotalAmount(totalAmount);
         orderRepository.save(order);
+        //create and edit bill
+        bill.setTotalPrice(totalAmount);
+        bill.setOrderId(order.getId());
+        bill.setPaymentAmount(request.getPaymentAmount());
+        bill.setPaymentDate(request.getPaymentDate());
+        bill.setPaymentMethod(request.getPaymentMethod());
+        billRepository.save(bill);
 //        exportReceiptService.saveExportReceipt(request, order.getId());
         return orderDetailRepository.saveAll(orderDetailEntityList);
     }
@@ -123,8 +145,14 @@ public class OrderService extends BaseService {
             if (order == null) {
                 throw new NullPointerException("Not found order");
             }
-            order.setOrderStatus(OrderStatus.CANCEL.getName());
+            order.setOrderStatus(OrderStatus.CANCEL.getType());
+            order.setStatus(false);
+            List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(order.getId());
+            for (OrderDetailEntity orderDetail : orderDetailEntityList) {
+                orderDetail.setStatus(false);
+            }
             order.setUpdatedDate(new Date());
+            orderDetailRepository.saveAll(orderDetailEntityList);
             return ResponseEntity.ok(new Result("SUCCESS", "OK", orderRepository.save(order)));
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
@@ -204,13 +232,28 @@ public class OrderService extends BaseService {
         response.setOrderStatus(order.getOrderStatus());
         response.setCustomer(customer);
         response.setTotalAmount(order.getTotalAmount());
+        List<OrderDetailResponse> responses = new ArrayList<>();
+        List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(order.getId());
+        for (OrderDetailEntity orderDetail : orderDetailEntityList) {
+            responses.add(mapperOrderDetail(orderDetail));
+        }
+        BillEntity bill = billRepository.findBillEntityByOrderId(order.getId());
+        response.setBill(bill);
+        response.setOrderDetailResponseList(responses);
         return response;
     }
 
     private OrderDetailResponse mapperOrderDetail(OrderDetailEntity orderDetail) {
         OrderDetailResponse response = new OrderDetailResponse();
+        ProductEntity product = productRepository.findById(orderDetail.getProductId()).orElse(null);
+        if (product == null) {
+            throw new NullPointerException("Not found product");
+        }
+        response.setProductId(orderDetail.getProductId());
+        response.setPriceUnit(product.getPrice());
+        response.setImageUrls(List.of(product.getProductImages()));
+        response.setProductName(product.getProductName());
         response.setQuantity(orderDetail.getQuantity());
-        response.setProduct(productService.detailProduct(orderDetail.getProductId()));
         response.setTotalPrice(orderDetail.getTotalPrice());
         return response;
     }

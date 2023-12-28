@@ -1,9 +1,7 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
-import com.kenzy.manage.do_an_quan_ly_kho.entity.ExportReceiptDetailEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.ExportReceiptEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderDetailEntity;
-import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.*;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.OrderStatus;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ExportReceiptRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
@@ -194,6 +192,11 @@ public class ExportReceiptService extends BaseService {
         exportReceipt.setCreatedBy(getNameByToken());
         exportReceipt.setUpdatedBy(getNameByToken());
         exportReceiptRepository.save(exportReceipt);
+        OrderEntity order = orderRepository.findById(request.getOrderId()).orElse(null);
+        if(order == null){
+            throw new NullPointerException("Not found order");
+        }
+        order.setOrderStatus(OrderStatus.SHIPPING.getType());
         List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(request.getOrderId());
         for (OrderDetailEntity orderDetail : orderDetailEntityList) {
             ExportReceiptDetailEntity exportReceiptDetail = new ExportReceiptDetailEntity();

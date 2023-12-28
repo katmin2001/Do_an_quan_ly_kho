@@ -21,7 +21,7 @@ public class OrderEntity extends BaseEntity{
     @Column(name = "order_date")
     private Date orderDate;
     @Column(name = "order_status")
-    private String orderStatus;
+    private Integer orderStatus;
     @Column(name = "customer_id")
     private Long customerId;
     @Column(name = "total_amount")

@@ -15,4 +15,5 @@ public interface BillRepository extends JpaRepository<BillEntity, Long> {
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tb.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tb.created_date <= :toDate) ", nativeQuery = true)
     Page<BillEntity> search(Date fromDate, Date toDate, Pageable pageable);
+    BillEntity findBillEntityByOrderId(Long orderId);
 }

@@ -1,9 +1,11 @@
 package com.kenzy.manage.do_an_quan_ly_kho.entity.constant;
 
 public enum OrderStatus {
-    IN_PROGRESS(1, "Đang xử lý"),
-    CANCEL(2, "Hủy"),
-    IN_TRANSIT(3, "Đang vận chuyển");
+    IN_PROGRESS(1, "Processing"),
+    CANCEL(2, "Cancelled"),
+    SHIPPING(3, "Shipping"),
+    RETURNED_REFUNDED(4, "Returned/Refunded"),
+    COMLPLETED(5, "Completed");
 
     private final int type;
     private final String name;
