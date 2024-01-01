@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class ExportReceiptResponse {
     private Long id;
+    private String code;
     private Date exportDate;
     private Date createdDate;
     private String createdBy;

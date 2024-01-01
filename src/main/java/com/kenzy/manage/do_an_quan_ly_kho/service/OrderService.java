@@ -93,6 +93,8 @@ public class OrderService extends BaseService {
         order.setCustomerId(request.getCustomerId());
         order.setCreatedBy(getNameByToken());
         orderRepository.save(order);
+        order.setCode(createCode("ORD", order.getId()));
+        orderRepository.save(order);
         BigDecimal totalAmount = BigDecimal.valueOf(0);
         for (OrderProductRequest productRequest : request.getOrderProductRequestList()) {
             OrderDetailEntity orderDetail = new OrderDetailEntity();
@@ -170,7 +172,7 @@ public class OrderService extends BaseService {
     public ResponseEntity<Result> searchOrder(SearchRequest request) {
         MetaList metaList = request.getMeta();
         Pageable pageable = buildPageable(request.getMeta(), "created_date", true);
-        Page<OrderEntity> page = orderRepository.search(request.getFromDate(), request.getToDate(), pageable);
+        Page<OrderEntity> page = orderRepository.search(request.getKeyword(), request.getFromDate(), request.getToDate(), pageable);
         List<OrderResponse> responses = new ArrayList<>();
         for (OrderEntity order : page) {
             responses.add(mapperOrder(order));
@@ -228,6 +230,7 @@ public class OrderService extends BaseService {
         }
         OrderResponse response = new OrderResponse();
         response.setId(order.getId());
+        response.setCode(order.getCode());
         response.setOrderDate(order.getOrderDate());
         response.setOrderStatus(order.getOrderStatus());
         response.setCustomer(customer);

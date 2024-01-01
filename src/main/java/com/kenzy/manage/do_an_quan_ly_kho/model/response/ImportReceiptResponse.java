@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class ImportReceiptResponse {
     private Long id;
+    private String code;
     private String name;
     private Date importDate;
     private List<ImportReceiptDetailResponse> importReceiptDetailResponseList;

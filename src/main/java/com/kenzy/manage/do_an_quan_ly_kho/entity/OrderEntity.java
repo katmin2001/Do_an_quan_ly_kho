@@ -26,4 +26,6 @@ public class OrderEntity extends BaseEntity{
     private Long customerId;
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
+    @Column(name = "code")
+    private String code;
 }

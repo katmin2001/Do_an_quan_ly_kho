@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class OrderResponse {
     private Long id;
+    private String code;
     private Date orderDate;
     private Integer orderStatus;
     private CustomerEntity customer;

@@ -103,6 +103,7 @@ public class ExportReceiptService extends BaseService {
     private ExportReceiptResponse mapperExportReceipt(ExportReceiptEntity exportReceipt) {
         ExportReceiptResponse response = new ExportReceiptResponse();
         response.setId(exportReceipt.getId());
+        response.setCode(exportReceipt.getCode());
         response.setName(exportReceipt.getName());
         response.setExportDate(exportReceipt.getExportDate());
         response.setCreatedBy(exportReceipt.getCreatedBy());
@@ -191,6 +192,8 @@ public class ExportReceiptService extends BaseService {
         exportReceipt.setOrderId(request.getOrderId());
         exportReceipt.setCreatedBy(getNameByToken());
         exportReceipt.setUpdatedBy(getNameByToken());
+        exportReceiptRepository.save(exportReceipt);
+        exportReceipt.setCode(createCode("ER", exportReceipt.getId()));
         exportReceiptRepository.save(exportReceipt);
         OrderEntity order = orderRepository.findById(request.getOrderId()).orElse(null);
         if(order == null){

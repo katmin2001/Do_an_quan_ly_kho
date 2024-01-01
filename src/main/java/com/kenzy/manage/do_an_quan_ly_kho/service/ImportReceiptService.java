@@ -79,6 +79,7 @@ public class ImportReceiptService extends BaseService {
             List<ImportReceiptDetailEntity> importReceiptDetailList = importReceiptDetailRepository.getImportReceiptDetailEntitiesByImportReceiptId(importReceipt.getId());
             ImportReceiptResponse receiptResponse = new ImportReceiptResponse();
             receiptResponse.setImportDate(importReceipt.getImportDate());
+            receiptResponse.setCode(importReceipt.getCode());
             receiptResponse.setId(importReceipt.getId());
             receiptResponse.setName(importReceipt.getName());
             List<ImportReceiptDetailResponse> importReceiptDetailResponseList = new ArrayList<>();
@@ -181,6 +182,8 @@ public class ImportReceiptService extends BaseService {
         importReceipt.setName(request.getName());
         importReceipt.setCreatedBy(getNameByToken());
         importReceipt.setUpdatedBy(getNameByToken());
+        importReceiptRepository.save(importReceipt);
+        importReceipt.setCode(createCode("IR", importReceipt.getId()));
         importReceiptRepository.save(importReceipt);
         for (ImportReceiptDetailRequest receiptDetailRequest : request.getImportReceiptDetailRequest()) {
             ImportReceiptDetailEntity importReceiptDetail = new ImportReceiptDetailEntity();

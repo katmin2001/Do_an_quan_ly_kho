@@ -23,4 +23,6 @@ public class ImportReceiptEntity extends BaseEntity {
     private String name;
     @Column(name = "ware_house_id")
     private Long wareHouseId;
+    @Column(name = "code")
+    private String code;
 }

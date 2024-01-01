@@ -16,6 +16,7 @@ public interface ImportReceiptRepository extends JpaRepository<ImportReceiptEnti
             "FROM quan_ly_kho.tbl_import_receipt tir " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tir.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tir.created_date <= :toDate) " +
-            "AND (LOWER(tir.name) like CONCAT('%', LOWER(:keyword), '%')) ", nativeQuery = true)
+            "AND ((LOWER(tir.name) like CONCAT('%', LOWER(:keyword), '%')) " +
+            "OR (LOWER(tir.code) like CONCAT('%', LOWER(:keyword), '%'))) ", nativeQuery = true)
     Page<ImportReceiptEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 }

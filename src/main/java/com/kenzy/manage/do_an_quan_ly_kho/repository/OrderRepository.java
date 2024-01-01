@@ -14,6 +14,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     @Query(value = "SELECT * " +
             "FROM quan_ly_kho.tbl_order toa " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR toa.created_date >= :fromDate) " +
-            "AND (CAST(:toDate AS DATETIME) IS NULL OR toa.created_date <= :toDate) ", nativeQuery = true)
-    Page<OrderEntity> search(Date fromDate, Date toDate, Pageable pageable);
+            "AND (CAST(:toDate AS DATETIME) IS NULL OR toa.created_date <= :toDate) " +
+            "AND (LOWER(toa.code) like CONCAT('%', LOWER(:keyword), '%')) ", nativeQuery = true)
+    Page<OrderEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 }

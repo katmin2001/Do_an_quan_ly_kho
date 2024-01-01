@@ -59,15 +59,20 @@ public abstract class BaseService {
 
         return PageRequest.of(pageNum, pageSize, sort);
     }
+
     protected MetaList buildMetaList(Pageable pageable, Long total) {
         Integer pageNum = pageable.isUnpaged() ? Constants.PAGE_NUM_DEFAULT : pageable.getPageNumber();
         Integer pageSize = pageable.isUnpaged() ? Constants.PAGE_SIZE_DEFAULT : pageable.getPageSize();
         return MetaList.builder().pageNum(pageNum).pageSize(pageSize).total(total).build();
     }
 
-    protected String getNameByToken(){
+    protected String getNameByToken() {
         String token = httpServletRequest.getHeader("Authorization").substring(7);
         String username = jwtService.extractUsername(token);
         return username;
+    }
+
+    protected String createCode(String code, Long id) {
+        return code + id;
     }
 }
