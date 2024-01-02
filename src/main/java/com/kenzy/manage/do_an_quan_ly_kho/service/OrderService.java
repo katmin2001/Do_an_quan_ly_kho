@@ -154,6 +154,17 @@ public class OrderService extends BaseService {
                 orderDetail.setStatus(false);
             }
             order.setUpdatedDate(new Date());
+            ExportReceiptEntity exportReceipt = exportReceiptRepository.findExportReceiptEntityByOrderId(id);
+            if (exportReceipt == null) {
+                throw new NullPointerException("Not found export receipt");
+            }
+            exportReceipt.setStatus(false);
+            List<ExportReceiptDetailEntity> exportReceiptDetailEntityList = exportReceiptDetailRepository.findExportReceiptDetailEntitiesByExportReceiptId(exportReceipt.getId());
+            for (ExportReceiptDetailEntity exportReceiptDetail : exportReceiptDetailEntityList) {
+                exportReceiptDetail.setStatus(false);
+            }
+            exportReceiptDetailRepository.saveAll(exportReceiptDetailEntityList);
+            exportReceiptRepository.save(exportReceipt);
             orderDetailRepository.saveAll(orderDetailEntityList);
             return ResponseEntity.ok(new Result("SUCCESS", "OK", orderRepository.save(order)));
         } catch (NullPointerException e) {

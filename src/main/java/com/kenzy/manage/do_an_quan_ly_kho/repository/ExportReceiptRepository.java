@@ -18,4 +18,5 @@ public interface ExportReceiptRepository extends JpaRepository<ExportReceiptEnti
             "AND ((LOWER(er.name) like CONCAT('%', LOWER(:keyword), '%')) " +
             "OR (LOWER(er.code) like CONCAT('%', LOWER(:keyword), '%'))) ", nativeQuery = true)
     Page<ExportReceiptEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
+    ExportReceiptEntity findExportReceiptEntityByOrderId(Long id);
 }

@@ -178,7 +178,7 @@ public class ImportReceiptService extends BaseService {
             importReceiptDetailList.clear();
             importReceipt.setUpdatedDate(new Date());
         }
-        importReceipt.setImportDate(new Date());
+        importReceipt.setImportDate(request.getImportDate());
         importReceipt.setName(request.getName());
         importReceipt.setCreatedBy(getNameByToken());
         importReceipt.setUpdatedBy(getNameByToken());

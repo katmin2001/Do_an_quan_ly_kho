@@ -144,7 +144,7 @@ public class ExportReceiptService extends BaseService {
         return response;
     }
 
-    private ExportReceiptEntity deleteExportReceipt(Long id) {
+    public ExportReceiptEntity deleteExportReceipt(Long id) {
         ExportReceiptEntity exportReceipt = exportReceiptRepository.findById(id).orElse(null);
         if (exportReceipt == null) {
             throw new NullPointerException("Not found export receipt");
@@ -177,6 +177,7 @@ public class ExportReceiptService extends BaseService {
         List<ExportReceiptDetailEntity> exportReceiptDetailEntityList = new ArrayList<>();
         if (request.getId() == null) {
             exportReceipt = new ExportReceiptEntity();
+            exportReceipt.setOrderId(request.getOrderId());
         } else {
             exportReceipt = exportReceiptRepository.findById(request.getId()).orElse(null);
             if (exportReceipt == null) {
@@ -189,7 +190,6 @@ public class ExportReceiptService extends BaseService {
         }
         exportReceipt.setExportDate(request.getExportDate());
         exportReceipt.setName(request.getName());
-        exportReceipt.setOrderId(request.getOrderId());
         exportReceipt.setCreatedBy(getNameByToken());
         exportReceipt.setUpdatedBy(getNameByToken());
         exportReceiptRepository.save(exportReceipt);
@@ -200,7 +200,7 @@ public class ExportReceiptService extends BaseService {
             throw new NullPointerException("Not found order");
         }
         order.setOrderStatus(OrderStatus.SHIPPING.getType());
-        List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(request.getOrderId());
+        List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(exportReceipt.getOrderId());
         for (OrderDetailEntity orderDetail : orderDetailEntityList) {
             ExportReceiptDetailEntity exportReceiptDetail = new ExportReceiptDetailEntity();
             Integer quantityInWareHouse = importReceiptDetailRepository.getQuantityProductInWareHouseById(orderDetail.getProductId());
