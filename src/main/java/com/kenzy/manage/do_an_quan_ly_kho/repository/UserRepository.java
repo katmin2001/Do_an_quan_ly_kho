@@ -17,10 +17,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     boolean existsUserByUsername(String username);
 
-    @Query(value = "SELECT tu.id, tu.username, tu.name, tu.email, tu.address, tu.phone FROM quan_ly_kho.tbl_user tu " +
+    @Query(value = "SELECT tu.id, tu.username, tu.name, tu.email, tu.address, tu.phone, tu.role as role, tu.avatar as avatar FROM quan_ly_kho.tbl_user tu " +
             "WHERE (CAST(:fromDate AS DATETIME) IS NULL OR tu.created_date >= :fromDate) " +
             "AND (CAST(:toDate AS DATETIME) IS NULL OR tu.created_date <= :toDate) " +
-            "AND (LOWER(tu.name) like CONCAT('%', LOWER(:keyword), '%') or tu.username like CONCAT('%', LOWER(:keyword), '%')) AND tu.status = true AND tu.role != 'ADMIN' ",
+            "AND (LOWER(tu.name) like CONCAT('%', LOWER(:keyword), '%') or tu.username like CONCAT('%', LOWER(:keyword), '%')) AND tu.status = true AND tu.username != 'admin' ",
             nativeQuery = true)
     Page<IGetUserResponse> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 }

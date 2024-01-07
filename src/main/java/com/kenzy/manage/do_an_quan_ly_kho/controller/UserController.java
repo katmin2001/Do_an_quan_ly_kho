@@ -2,6 +2,7 @@ package com.kenzy.manage.do_an_quan_ly_kho.controller;
 
 import com.kenzy.manage.do_an_quan_ly_kho.auth.AuthenticationService;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.ChangePasswordRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserEditRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserRequest;
@@ -23,7 +24,7 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity<Result> create(@RequestPart UserRequest request,
-                                         @RequestPart MultipartFile file) {
+                                         @RequestPart(value = "file", required = false) MultipartFile file) {
         return userService.create(request, file);
     }
 
@@ -56,5 +57,15 @@ public class UserController {
     @PostMapping("/search")
     public ResponseEntity<Result> search(@RequestBody SearchRequest request) {
         return userService.searchUser(request);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Result> changePassword(@RequestBody ChangePasswordRequest request) {
+        return userService.changePasswordUser(request);
+    }
+
+    @GetMapping("/delete/{id}")
+    public ResponseEntity<Result> delete(@PathVariable("id") Long id) {
+        return userService.delete(id);
     }
 }

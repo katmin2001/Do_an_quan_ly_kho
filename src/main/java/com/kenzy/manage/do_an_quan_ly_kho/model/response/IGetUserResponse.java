@@ -7,4 +7,6 @@ public interface IGetUserResponse {
     String getEmail();
     String getAddress();
     String getPhone();
+    String getRole();
+    String getAvatar();
 }

@@ -3,6 +3,7 @@ package com.kenzy.manage.do_an_quan_ly_kho.service;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.UserEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Role;
+import com.kenzy.manage.do_an_quan_ly_kho.model.request.ChangePasswordRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserEditRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.UserRequest;
@@ -37,9 +38,9 @@ public class UserService extends BaseService {
         try {
             return ResponseEntity.ok(new Result("SUCCESS", "OK", createUser(request, file)));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Result("USERNAME ALREADY EXIST!", "CONFLICT", null));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Result(e.getMessage(), "CONFLICT", null));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
     }
 
@@ -77,6 +78,24 @@ public class UserService extends BaseService {
         }
     }
 
+    public ResponseEntity<Result> changePasswordUser(ChangePasswordRequest request) {
+        try {
+            changePassword(request);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
+        }
+    }
+
+    public ResponseEntity<Result> delete(Long id) {
+        try {
+            deleteUser(id);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
+        } catch (NullPointerException | IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
+        }
+    }
+
     public ResponseEntity<Result> detail(Long id) {
         try {
             UserEntity user = userRepository.findById(id).orElseThrow(null);
@@ -99,19 +118,41 @@ public class UserService extends BaseService {
     }
 
     private UserEntity createUser(UserRequest request, MultipartFile file) throws IOException {
-        UserEntity user = new UserEntity();
-        if (userRepository.existsUserByUsername(request.getUsername())) {
-            throw new RuntimeException();
+        UserEntity user = null;
+        if (request.getId() == null) {
+            user = new UserEntity();
+            if (userRepository.existsUserByUsername(request.getUsername())) {
+                throw new RuntimeException("Username is already used");
+            }
+            user.setUsername(request.getUsername());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setCreatedBy(getNameByToken());
+            user.setCreatedDate(new Date());
+            user.setRole(Role.valueOf(request.getRole()));
+            if (file != null) {
+                user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
+            }
+        } else {
+            user = userRepository.findById(request.getId()).orElseThrow(null);
+            if (user == null) {
+                throw new NullPointerException();
+            }
+            user.setUpdatedBy(getNameByToken());
+            user.setUpdatedDate(new Date());
+            if (file != null) {
+                FileService.deleteFile(user.getAvatar());
+                user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
+            }
+            if (getNameByToken().compareTo(request.getUsername()) == 0 && request.getRole().compareTo(String.valueOf(user.getRole())) != 0) {
+                throw new RuntimeException("Cannot edit your role");
+            } else {
+                user.setRole(Role.valueOf(request.getRole()));
+            }
         }
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setAddress(request.getAddress());
-        user.setAvatar(FileService.uploadFile(file, UPLOAD_DIR));
-        user.setRole(Role.USER);
-        user.setCreatedBy(getNameByToken());
         return userRepository.save(user);
     }
 
@@ -161,4 +202,27 @@ public class UserService extends BaseService {
         return userRepository.save(user);
     }
 
+    private void changePassword(ChangePasswordRequest request) {
+        UserEntity user = userRepository.findByUsername(request.getUsername()).orElse(null);
+        if (user == null) {
+            throw new NullPointerException("Not found user");
+        }
+        if (request.getRePassword().compareTo(request.getPassword()) != 0) {
+            throw new NullPointerException("Password do not match");
+        }
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new NullPointerException("The new password must not be the same as the used password");
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+    }
+
+    private void deleteUser(Long id) throws IOException {
+        UserEntity user = userRepository.findById(id).orElseThrow(null);
+        if (user == null || user.getRole().equals(Role.ADMIN)) {
+            throw new NullPointerException();
+        }
+        FileService.deleteFile(user.getAvatar());
+        userRepository.delete(user);
+    }
 }
