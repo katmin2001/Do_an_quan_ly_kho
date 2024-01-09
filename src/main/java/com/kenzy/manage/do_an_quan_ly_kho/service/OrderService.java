@@ -11,6 +11,7 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.response.OrderDetailResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.OrderResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.*;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,8 @@ public class OrderService extends BaseService {
     private CustomerRepository customerRepository;
     @Autowired
     private ProductService productService;
+    @Resource
+    private EmailService mailService;
 
     public ResponseEntity<Result> createAndUpdate(OrderRequest request) {
         try {
@@ -78,6 +81,19 @@ public class OrderService extends BaseService {
             }
             if (order.getOrderStatus() == OrderStatus.SHIPPING.getType() && request.getOrderStatus() == OrderStatus.IN_PROGRESS.getType()) {
                 throw new RuntimeException("Shipping orders cannot be edited to process");
+            }
+            if (request.getOrderStatus() == OrderStatus.RETURNED_REFUNDED.getType()) {
+                ExportReceiptEntity exportReceipt = exportReceiptRepository.findExportReceiptEntityByOrderId(request.getId());
+                if (exportReceipt == null) {
+                    throw new NullPointerException("Not found export receipt");
+                }
+                exportReceipt.setStatus(false);
+                List<ExportReceiptDetailEntity> exportReceiptDetailEntityList = exportReceiptDetailRepository.findExportReceiptDetailEntitiesByExportReceiptId(exportReceipt.getId());
+                for (ExportReceiptDetailEntity exportReceiptDetail : exportReceiptDetailEntityList) {
+                    exportReceiptDetail.setStatus(false);
+                }
+                exportReceiptDetailRepository.saveAll(exportReceiptDetailEntityList);
+                exportReceiptRepository.save(exportReceipt);
             }
             orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(request.getId());
             orderDetailRepository.deleteAll(orderDetailEntityList);
@@ -137,6 +153,11 @@ public class OrderService extends BaseService {
         bill.setPaymentDate(request.getPaymentDate());
         bill.setPaymentMethod(request.getPaymentMethod());
         billRepository.save(bill);
+        CustomerEntity customer = customerRepository.findById(order.getCustomerId()).orElse(null);
+        if (customer == null) {
+            throw new NullPointerException("Not found customer");
+        }
+        mailService.sendMail(order, customer, orderDetailEntityList);
 //        exportReceiptService.saveExportReceipt(request, order.getId());
         return orderDetailRepository.saveAll(orderDetailEntityList);
     }

@@ -17,7 +17,7 @@ public interface ExportReceiptDetailRepository extends JpaRepository<ExportRecei
             "where product_id = :id and status = true ", nativeQuery = true)
     Integer getQuantityProductExportById(Long id);
 
-    List<ExportReceiptDetailEntity> getExportReceiptDetailEntitiesByProductId(Long id);
+    List<ExportReceiptDetailEntity> findExportReceiptDetailEntitiesByProductId(Long id);
 
     List<ExportReceiptDetailEntity> findExportReceiptDetailEntitiesByStatus(Boolean status);
 //    @Query(value = "SELECT tp.product_name as name,\n" +

@@ -1,5 +1,6 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
+import com.kenzy.manage.do_an_quan_ly_kho.entity.ExportReceiptDetailEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ImportReceiptDetailEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ImportReceiptEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
@@ -11,6 +12,7 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.response.ImportReceiptDetailResp
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.ImportReceiptResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.repository.ExportReceiptDetailRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ImportReceiptDetailRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ImportReceiptRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ProductRepository;
@@ -35,6 +37,8 @@ public class ImportReceiptService extends BaseService {
     private ImportReceiptDetailRepository importReceiptDetailRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ExportReceiptDetailRepository exportReceiptDetailRepository;
 
     public ResponseEntity<Result> createAndUpdate(ImportReceiptRequest request) {
         try {
@@ -49,7 +53,7 @@ public class ImportReceiptService extends BaseService {
             delete(id);
             return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
         } catch (NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result("Not found import receipt", "NOT_FOUND", null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
     }
 
@@ -112,11 +116,15 @@ public class ImportReceiptService extends BaseService {
 
     private void delete(Long id) {
         ImportReceiptEntity importReceipt = importReceiptRepository.findById(id).orElseThrow(null);
-        importReceipt.setStatus(false);
         List<ImportReceiptDetailEntity> importReceiptDetailList = importReceiptDetailRepository.getImportReceiptDetailEntitiesByImportReceiptId(id);
         for (ImportReceiptDetailEntity importReceiptDetail : importReceiptDetailList) {
+            List<ExportReceiptDetailEntity> exportReceiptDetailList = exportReceiptDetailRepository.findExportReceiptDetailEntitiesByProductId(importReceiptDetail.getProductId());
+            if(exportReceiptDetailList != null) {
+                throw new NullPointerException("The imported goods have been sold and cannot be canceled!");
+            }
             importReceiptDetail.setStatus(false);
         }
+        importReceipt.setStatus(false);
         importReceiptDetailRepository.saveAll(importReceiptDetailList);
         importReceiptRepository.save(importReceipt);
     }
