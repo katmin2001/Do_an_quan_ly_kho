@@ -1,6 +1,8 @@
 package com.kenzy.manage.do_an_quan_ly_kho.service;
 
+import com.kenzy.manage.do_an_quan_ly_kho.entity.CategoryEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
+import com.kenzy.manage.do_an_quan_ly_kho.entity.SupplierEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.Result;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductSearchRequest;
@@ -8,6 +10,7 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.response.MetaList;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.ProductResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.model.response.SearchResponse;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.*;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,6 +41,8 @@ public class ProductService extends BaseService {
     private ImportReceiptDetailRepository importReceiptDetailRepository;
     @Autowired
     private ExportReceiptDetailRepository exportReceiptDetailRepository;
+    @Resource
+    private ExcelService excelService;
 
     public ResponseEntity<Result> createAndEditProduct(ProductRequest request, List<MultipartFile> files) {
         try {
@@ -104,6 +110,71 @@ public class ProductService extends BaseService {
         return ResponseEntity.ok(new Result("SUCCESS", "OK", response));
     }
 
+    public ResponseEntity<Result> importProductsFromExcel(MultipartFile file) throws IOException {
+        List<List<String>> rows = excelService.readExcel(file);
+        List<ProductEntity> products = new ArrayList<>();
+        int indexProductName = 0, indexPrice = 0, indexSupplier = 0, indexCategory = 0, indexDescription = 0;
+        for (int i = 0; i < rows.get(0).size(); i++) {
+            switch (rows.get(0).get(i)) {
+                case "Tên sản phẩm":
+                    indexProductName = i;
+                    break;
+                case "Giá":
+                    indexPrice = i;
+                    break;
+                case "Nhà cung cấp":
+                    indexSupplier = i;
+                    break;
+                case "Loại hàng":
+                    indexCategory = i;
+                    break;
+                case "Mô tả":
+                    indexDescription = i;
+                    break;
+            }
+        }
+        rows.remove(0);
+        for (List<String> row : rows) {
+            if (row.get(0) == "") {
+                break;
+            }
+            String productName = row.get(indexProductName);
+            BigDecimal price = BigDecimal.valueOf(Double.parseDouble(row.get(indexPrice)));
+            String supplierName = row.get(indexSupplier);
+            String categoryName = row.get(indexCategory);
+            String description = row.get(indexDescription);
+
+            ProductEntity product = new ProductEntity();
+            product.setProductName(productName);
+            product.setPrice(price);
+            product.setDescription(description);
+            CategoryEntity category = categoryRepository.findCategoryEntityByName(categoryName);
+            if (category == null) {
+                category = new CategoryEntity();
+                category.setName(categoryName);
+                category.setCreatedDate(new Date());
+                category.setCreatedBy(getNameByToken());
+                categoryRepository.save(category);
+            }
+            product.setCategoryId(category.getId());
+            SupplierEntity supplier = supplierRepository.findSupplierEntityByContactName(supplierName);
+            if (supplier == null) {
+                supplier = new SupplierEntity();
+                supplier.setContactName(supplierName);
+                supplier.setCreatedBy(getNameByToken());
+                supplier.setCreatedDate(new Date());
+                supplierRepository.save(supplier);
+            }
+            product.setSupplierId(supplier.getId());
+            product.setCreatedDate(new Date());
+            product.setCreatedBy(getNameByToken());
+
+            products.add(product);
+            productRepository.save(product);
+        }
+        return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
+    }
+
     private ProductEntity inactive(Long id) {
         ProductEntity product = productRepository.findById(id).orElseThrow(null);
         product.setStatus(false);
@@ -153,17 +224,20 @@ public class ProductService extends BaseService {
             product = productRepository.findById(request.getId()).orElseThrow(null);
             product.setUpdatedDate(new Date());
             product.setUpdatedBy(getNameByToken());
-            List<String> urls = new ArrayList<>(Arrays.asList(product.getProductImages()));
-            List<String> imageUrls = new ArrayList<>(Arrays.asList(request.getProductImages()));
+//            String[] productImages = product.getProductImages();
+            String[] urls = product.getProductImages();
+            List<String> imageUrls = Arrays.asList(request.getProductImages());
             List<String> newUrls = new ArrayList<>();
-            for (String url : urls) {
-                if (imageUrls.contains(url)) {
-                    newUrls.add(url);
-                }
-                else {
-                    FileService.deleteFile(url);
+            if (urls != null && imageUrls != null) {
+                for (String url : urls) {
+                    if (imageUrls.contains(url)) {
+                        newUrls.add(url);
+                    } else {
+                        FileService.deleteFile(url);
+                    }
                 }
             }
+
             if (files != null) {
                 if (files.size() != 0 && !files.get(0).getOriginalFilename().equals("")) {
                     for (MultipartFile file : files) {

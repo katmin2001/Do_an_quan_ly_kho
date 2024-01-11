@@ -5,6 +5,8 @@ import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderDetailEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.OrderEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.ProductEntity;
 import com.kenzy.manage.do_an_quan_ly_kho.entity.constant.OrderStatus;
+import com.kenzy.manage.do_an_quan_ly_kho.model.response.OrderResponse;
+import com.kenzy.manage.do_an_quan_ly_kho.repository.OrderDetailRepository;
 import com.kenzy.manage.do_an_quan_ly_kho.repository.ProductRepository;
 import jakarta.annotation.Resource;
 import jakarta.mail.MessagingException;
@@ -24,7 +26,9 @@ public class EmailService {
     private JavaMailSender javaMailSender;
     @Resource
     private ProductRepository productRepository;
-    public void sendMail(OrderEntity order, CustomerEntity customer, List<OrderDetailEntity> orderDetailList){
+    @Resource
+    private OrderDetailRepository orderDetailRepository;
+    public void sendMail(OrderResponse order){
         try{
             MimeMessage message = javaMailSender.createMimeMessage();
             message.setFrom(new InternetAddress("anh.trannguyenduc@vti.com.vn","Shop"));
@@ -42,6 +46,7 @@ public class EmailService {
 //                    +"\nTotal Amount: "+order.getTotalAmount() + " VNĐ"
 //                    +"\nStatus: "+orderStatus
 //                    +"\nOrder Date: "+order.getOrderDate();
+            CustomerEntity customer = order.getCustomer();
             String contextMail = "<html>"
                     + "<head>"
                     + "<style>"
@@ -75,6 +80,7 @@ public class EmailService {
                     + "<th>Price Unit</th>"
                     + "<th>Total Price</th>"
                     + "</tr>";
+            List<OrderDetailEntity> orderDetailList = orderDetailRepository.findOrderDetailEntitiesByOrderId(order.getId());
             for (OrderDetailEntity orderDetail : orderDetailList) {
                 ProductEntity product = productRepository.findById(orderDetail.getProductId()).orElse(null);
                 if(product == null){

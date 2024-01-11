@@ -38,4 +38,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
             "GROUP BY\n" +
             "  tc.name ", nativeQuery = true)
     List<IGetStatisticByCategoryOrProduct> getStatisticByCategory();
+
+    CategoryEntity findCategoryEntityByName(String name);
 }

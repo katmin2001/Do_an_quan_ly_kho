@@ -6,10 +6,12 @@ import com.kenzy.manage.do_an_quan_ly_kho.model.request.ProductSearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.model.request.SearchRequest;
 import com.kenzy.manage.do_an_quan_ly_kho.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -49,5 +51,14 @@ public class ProductController {
     @PostMapping("/active/{id}")
     public ResponseEntity<Result> active(@PathVariable("id") Long id) {
         return productService.activeProduct(id);
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<Result> importProductsByExcel(@RequestPart(value = "file", required = false) MultipartFile file){
+        try{
+            return productService.importProductsFromExcel(file);
+        }catch (IOException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Result("Error importing products","BAD_REQUEST", e.getMessage()));
+        }
     }
 }

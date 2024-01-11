@@ -18,4 +18,5 @@ public class OrderResponse {
     private List<OrderDetailResponse> orderDetailResponseList;
     private BigDecimal totalAmount;
     private BillEntity bill;
+    private String createdBy;
 }

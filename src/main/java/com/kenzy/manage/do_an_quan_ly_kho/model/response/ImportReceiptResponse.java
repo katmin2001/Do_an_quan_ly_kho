@@ -14,4 +14,5 @@ public class ImportReceiptResponse {
     private List<ImportReceiptDetailResponse> importReceiptDetailResponseList;
     private BigDecimal totalPrice;
     private Boolean status;
+    private String createdBy;
 }

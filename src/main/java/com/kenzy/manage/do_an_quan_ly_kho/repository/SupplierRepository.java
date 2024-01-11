@@ -19,4 +19,6 @@ public interface SupplierRepository extends JpaRepository<SupplierEntity, Long> 
     Page<SupplierEntity> search(String keyword, Date fromDate, Date toDate, Pageable pageable);
 
     boolean existsSupplierEntityById(Long id);
+
+    SupplierEntity findSupplierEntityByContactName(String name);
 }

@@ -18,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,6 +58,15 @@ public class OrderService extends BaseService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Result(e.getMessage(), "CONFLICT", null));
+        }
+    }
+
+    public ResponseEntity<Result> sendMailOrder(OrderResponse order) {
+        try {
+            mailService.sendMail(order);
+            return ResponseEntity.ok(new Result("SUCCESS", "OK", null));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Result(e.getMessage(), "NOT_FOUND", null));
         }
     }
 
@@ -157,10 +168,14 @@ public class OrderService extends BaseService {
         if (customer == null) {
             throw new NullPointerException("Not found customer");
         }
-        mailService.sendMail(order, customer, orderDetailEntityList);
+//        mailService.sendMail(order, customer, orderDetailEntityList);
 //        exportReceiptService.saveExportReceipt(request, order.getId());
         return orderDetailRepository.saveAll(orderDetailEntityList);
     }
+
+//    private void sendMail(OrderResponse order) {
+//        mailService.sendMail(order);
+//    }
 
     public ResponseEntity<Result> cancelOrder(Long id) {
         try {
@@ -176,16 +191,15 @@ public class OrderService extends BaseService {
             }
             order.setUpdatedDate(new Date());
             ExportReceiptEntity exportReceipt = exportReceiptRepository.findExportReceiptEntityByOrderId(id);
-            if (exportReceipt == null) {
-                throw new NullPointerException("Not found export receipt");
+            if (exportReceipt != null) {
+                exportReceipt.setStatus(false);
+                List<ExportReceiptDetailEntity> exportReceiptDetailEntityList = exportReceiptDetailRepository.findExportReceiptDetailEntitiesByExportReceiptId(exportReceipt.getId());
+                for (ExportReceiptDetailEntity exportReceiptDetail : exportReceiptDetailEntityList) {
+                    exportReceiptDetail.setStatus(false);
+                }
+                exportReceiptDetailRepository.saveAll(exportReceiptDetailEntityList);
+                exportReceiptRepository.save(exportReceipt);
             }
-            exportReceipt.setStatus(false);
-            List<ExportReceiptDetailEntity> exportReceiptDetailEntityList = exportReceiptDetailRepository.findExportReceiptDetailEntitiesByExportReceiptId(exportReceipt.getId());
-            for (ExportReceiptDetailEntity exportReceiptDetail : exportReceiptDetailEntityList) {
-                exportReceiptDetail.setStatus(false);
-            }
-            exportReceiptDetailRepository.saveAll(exportReceiptDetailEntityList);
-            exportReceiptRepository.save(exportReceipt);
             orderDetailRepository.saveAll(orderDetailEntityList);
             return ResponseEntity.ok(new Result("SUCCESS", "OK", orderRepository.save(order)));
         } catch (NullPointerException e) {
@@ -267,6 +281,7 @@ public class OrderService extends BaseService {
         response.setOrderStatus(order.getOrderStatus());
         response.setCustomer(customer);
         response.setTotalAmount(order.getTotalAmount());
+        response.setCreatedBy(order.getCreatedBy());
         List<OrderDetailResponse> responses = new ArrayList<>();
         List<OrderDetailEntity> orderDetailEntityList = orderDetailRepository.findOrderDetailEntitiesByOrderId(order.getId());
         for (OrderDetailEntity orderDetail : orderDetailEntityList) {
